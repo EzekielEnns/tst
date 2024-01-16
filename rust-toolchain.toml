@@ -1,0 +1,6 @@
+#to add the wasm tool chain
+[toolchain]
+channel = "stable"
+components = []
+targets = [ "wasm32-unknown-unknown" ]
+profile = "default"

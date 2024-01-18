@@ -172,6 +172,12 @@ struct World<'a>{
 }
 
 impl<'a> World<'a> {
+    fn step() {} //this represents a change in the simulation
+                 //so a action would happen
+                 //this would return a renderable secene 
+                 //and the frontend would animate to this point
+                 //i.e. move_to(), sim = step(), renderloop(=> animate to sim)
+                 //think i frames form ds, the input is read first and the animation comes second
     fn find_path(){}
     fn progress(){} //progress's all movments/destinations
     fn render() {} //outputs the visable render section of world

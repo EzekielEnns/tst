@@ -11,10 +11,9 @@ use wasm_bindgen::prelude::*;
 #[derive(Default, Serialize, Deserialize, Clone, Copy)]
 pub struct Stats {
     hp: f32,
-    max_hp:f32,
     sp: f32,
-    max_sp:f32,
-    status: [i32; 10],
+    status:[i32;1]
+    //FIXME add speed/enum
 }
 
 impl ops::AddAssign for Stats {
@@ -51,6 +50,7 @@ impl ops::SubAssign for Stats {
     }
 }
 
+//TODO maybe remove serde here and make special deisplay objects or json?
 #[derive(Serialize, Deserialize)]
 pub struct Skill {
     cost: Stats,
@@ -64,10 +64,10 @@ pub struct Skill {
 }
 
 //used for rendering/displaying to the screen
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize,Clone, Copy)]
 struct Glyph {
     value:char,
-    color:[u8;4]
+    color:[f32;4]
 }
 
 struct Combo {
@@ -102,7 +102,7 @@ impl<'a> Team<'a> {
  * */
 struct Entity {
     glyph: Glyph,
-    stats:Stats,
+    max_stats: Stats,
     items:Vec<Item>,
     skills:Vec<&'static Skill>,
     combos:Vec<&'static Combo>,
@@ -140,20 +140,22 @@ struct Projectile {
     step: i32,
     life: i32,
     index: i32,
+    //FIXME add area
 }
 impl Projectile {
-    fn age(){}
+    pub fn age(&mut self)->bool {
+       self.life -= 1;
+       return self.life <= 0
+    }
     fn on_hit(&self, _target:&Entity){}
     fn render(){}
 }
 
 struct Pos {
-    x:i32,
-    y:i32
+    x:i32, //column
+    y:i32  //row
 }
 
-//these are the types used in that static pointer array
-type Animation<'a>= fn(i32,&'a mut Pos);
 
 /* responsible for postions, 
  * storing game sate/like combat
@@ -167,17 +169,42 @@ struct World<'a>{
     t_enemy:Option<Team<'a>>,
     projectiles:Vec<(&'a mut Projectile, Pos)>,
     destinations:Vec<(usize,Pos)>,
-    v_width:i32,
-    v_height:i32,
+    v_width:usize,
+    v_height:usize,
 }
-
+const PLAYER_ENTITY_INDEX:usize = 0;
 impl<'a> World<'a> {
-    fn step() {} //this represents a change in the simulation
-                 //so a action would happen
-                 //this would return a renderable secene 
-                 //and the frontend would animate to this point
-                 //i.e. move_to(), sim = step(), renderloop(=> animate to sim)
-                 //think i frames form ds, the input is read first and the animation comes second
+    //this represents a change in the simulation
+    //so a action would happen
+    //this would return a renderable secene 
+    //and the frontend would animate to this point
+    //i.e. move_to(), sim = step(), renderloop(=> animate to sim)
+    //think i frames form ds, the input is read first and the animation comes second
+    
+    //note other changes to the World happen
+    //around this function, this is just stepping through
+    //claims that were already made
+    //so interactions can happen else where, and its processed
+    //else where
+    fn step (&mut self) {
+        //Phase 1 running simulation
+        //process destinations
+        //use entity movemnt speed
+        //FIXME add speed to stats
+
+        //check for collision with projectiles
+        //FIXME add area
+        //kill projectiles VVVVVV
+        if self.projectiles[0].0.age() {
+            //kill
+        }
+
+        //Phase 2 creating rendered area
+        //detemin area based on player location,
+        //collecet tiles for that area, add them to the array (single d array)
+        //add entites, projectile, items ontop/replace tiles
+    }
+    /* example fn
     fn find_path(){}
     fn progress(){} //progress's all movments/destinations
     fn render() {} //outputs the visable render section of world
@@ -185,13 +212,51 @@ impl<'a> World<'a> {
     fn get_area(){} //gets entites within an area
     fn in_range(){} //gets entites within an area
     fn do_skill(){} //checks if skill is in range&'a mut 
+    */
 }
 
 pub fn get_stats(){}
 pub fn get_preview(){}
 pub fn get_skills(){}
 pub fn get_combos(){}
+pub fn step(){}
 
+static TILES: [Tile;3] = [
+    Tile{
+        glyph:Glyph{value:'.',color:[0.5,0.5,0.5,1.0]},
+        collision: false
+    },
+    Tile{
+        glyph:Glyph{value:'|',color:[0.5,0.5,0.5,1.0]},
+        collision: true
+    },
+    Tile{
+        glyph:Glyph{value:'-',color:[0.5,0.5,0.5,1.0]},
+        collision: true
+    }
+];
+
+//TODO maybe make a struct just for display purposeses?
+
+type Animation= fn(i32,&mut Pos);
+fn ani_example(_step:i32,_pos:&mut Pos) { }
+static ANIMATIONS: [Animation;1] = [ ani_example ];
+
+static SKILLS: [Skill;1] = [
+    Skill {
+        cost:  Stats{hp:0.0,sp:0.0,status:[0]},       
+        name: "test",
+        range: 1,
+        effect: Stats{hp:0.0,sp:0.0,status:[0]},
+        deffense:false,
+        modifer:false,
+        projectile: Projectile{
+            step:0,
+            life:0,
+            index:0 //index in the ANIMATIONS const
+        },
+    }
+];
 
 #[wasm_bindgen]
 extern "C" {

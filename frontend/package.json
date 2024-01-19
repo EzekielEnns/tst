@@ -13,6 +13,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "glyplib": "^0.0.3",
     "simulation": "link:../simulation/pkg"
   },
   "devDependencies": {

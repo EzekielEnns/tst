@@ -151,9 +151,16 @@ impl Projectile {
     fn render(){}
 }
 
+#[derive(PartialEq, Eq)]
 struct Pos {
     x:i32, //column
     y:i32  //row
+}
+
+struct WorldEntity {
+    entity: Entity,
+    location: Pos,
+    destination: Pos
 }
 
 
@@ -162,57 +169,29 @@ struct Pos {
  * */
 struct World<'a>{
     //TODO check if muts are needed here
-    entites:Vec<(&'a mut Entity,Pos)>,
+    entites:Vec<&'a mut WorldEntity>,
     tiles:Vec<(&'a Tile,Pos)>,
     items:Vec<(&'a Item,Pos)>,
     t_player:Option<Team<'a>>,
     t_enemy:Option<Team<'a>>,
     projectiles:Vec<(&'a mut Projectile, Pos)>,
-    destinations:Vec<(usize,Pos)>,
     v_width:usize,
     v_height:usize,
 }
 const PLAYER_ENTITY_INDEX:usize = 0;
 impl<'a> World<'a> {
-    //this represents a change in the simulation
-    //so a action would happen
-    //this would return a renderable secene 
-    //and the frontend would animate to this point
-    //i.e. move_to(), sim = step(), renderloop(=> animate to sim)
-    //think i frames form ds, the input is read first and the animation comes second
-    
-    //note other changes to the World happen
-    //around this function, this is just stepping through
-    //claims that were already made
-    //so interactions can happen else where, and its processed
-    //else where
     fn step (&mut self) {
-        //Phase 1 running simulation
-        //process destinations
-        //use entity movemnt speed
-        //FIXME add speed to stats
-
-        //check for collision with projectiles
-        //FIXME add area
-        //kill projectiles VVVVVV
-        if self.projectiles[0].0.age() {
-            //kill
+        for _i in 0..self.entites.len() {
+            let mut _e = &self.entites[_i];
+            if _e.location != _e.destination {
+                //approch to destination
+            }
         }
 
-        //Phase 2 creating rendered area
-        //detemin area based on player location,
-        //collecet tiles for that area, add them to the array (single d array)
-        //add entites, projectile, items ontop/replace tiles
+        for _i in 0..self.projectiles.len() {
+            let mut _p = &self.projectiles[_i];
+        }
     }
-    /* example fn
-    fn find_path(){}
-    fn progress(){} //progress's all movments/destinations
-    fn render() {} //outputs the visable render section of world
-    fn move_to(){} //add postion to destinations
-    fn get_area(){} //gets entites within an area
-    fn in_range(){} //gets entites within an area
-    fn do_skill(){} //checks if skill is in range&'a mut 
-    */
 }
 
 pub fn get_stats(){}

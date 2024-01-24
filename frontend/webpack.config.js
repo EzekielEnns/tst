@@ -14,6 +14,7 @@ module.exports = {
       static: {
           directory: path.join(__dirname,'public'),
       },
+      //mimeTypes: { 'application/wasm': ['wasm'] },
       compress: true,
       port: 9000,
   }

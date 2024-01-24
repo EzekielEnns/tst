@@ -8,9 +8,6 @@ dependencies:
   glyplib:
     specifier: ^0.0.3
     version: 0.0.3
-  simulation:
-    specifier: link:../simulation/pkg
-    version: link:../simulation/pkg
 
 devDependencies:
   webpack:

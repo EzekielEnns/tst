@@ -13,8 +13,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "glyplib": "^0.0.3",
-    "simulation": "link:../simulation/pkg"
+    "glyplib": "^0.0.3"
   },
   "devDependencies": {
     "webpack": "^5.89.0",

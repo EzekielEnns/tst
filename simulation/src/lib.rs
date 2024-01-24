@@ -2,7 +2,6 @@
 mod utils;
 use std::{ops, f32};
 use serde::{Deserialize, Serialize};
-use wasm_bindgen::prelude::*;
 
 //TODO add skill and  animation static objects
 //TODO fill out all other functions
@@ -59,40 +58,100 @@ pub struct Skill {
     deffense: bool,
     name: &'static str,
     range: i32,
-    #[serde(skip)]
-    projectile:Projectile
+    //TODO add projectile
 }
 
-//used for rendering/displaying to the screen
-#[derive(Serialize, Deserialize,Clone, Copy)]
-struct Glyph {
-    value:char,
-    color:[f32;4]
-}
+/*
+ * what if for skills and combos we just use srede and Serialize the data?
+ *      we can Deserialize the data when we want to read it derectly off the 
+ *      alloc wasm memeory
+ *
+ *      okay i think im gonna skip wasm bind gen and instead use a serilization 
+ *      and deserilation method for this stuff, and then type cast the decoded stuff via 
+ *      jsdoc or a type deff file
+ *
+ *
+ *      i can use the following forms of serilization
+ *          cbor
+ *          https://github.com/paroga/cbor-js
+ *          messagePAck
+ *          https://serde.rs/
+ *
+ *
+ *      so the projecess would be: heres a pointer/stream of data 
+ *          in js get_skills() -> const *a
+ *          and then you would alloc that using types arrays
+ *              annnndddd thennnnn 
+ *                  you would convert it into a type/value
+ *
+ *      note to self
+ *          i might want to just try again with bindgen.....
+ *          
+ *          but the main issue here is that getting access to the map data,
+ *          and dealing with rendering the output properly is just really intense 
+ *
+ *          the best way to get the memory out it via just throwing it into pointer/
+ *          static consts, so there will always be a upper limit when the program starts....
+ *          thats a tad annoying but its not to bad
+ *
+ *
+ *          i could use a process of chunking?
+ *          where i take the values in one at a time and build a local array 
+ *          that is on the heap
+ *
+ *
+ *          oooookay this is actually really goood:
+ *          https://radu-matei.com/blog/practical-guide-to-wasm-memory/#passing-arrays-to-rust-webassembly-modules
+ *          neeed to read this
+ *
+ *          short and sweeat is that you can make a alloc and malloc inside wasm
+ *          and use them to pass arrays over to eitehr side
+ *
+ *          we dont need to pass arrays into the machine we just need to pass data 
+ *          out, so the nice thing here is when we our glyphs we would access the 3 pointers
+ *                  get_colors: u32
+ *                  get_char:   u8
+ *                  get_alpha:  u8
+ *          
+ *          what i could do for getting skills is i could allocate a bin rep of a 
+ *          skill, via proto buf or something like that,
+ *              so:
+ *                  js -> get_skills()
+ *                        calls a alloc() for skill
+ *                  rust -> alloc for binary data,
+ *                       -> put bin data in skills pointer and free it 
+ *                  js -> calls a delloc() once done, 
+ *                          or requests new skill, in that spot
+ *
+ *              skill struct would be different 
+ *                  
+ *
+ *
+ *          i could do protobuf?
+ *              i would love to use protobuffs
+ *               https://github.com/tokio-rs/prost
+ *               use buff cli and generate types
+ *
+ *
+ */
 
 struct Combo {
     combo:Vec<&'static Skill>,
     index: usize
 }
-impl Combo {
-    fn render() {} //for displaying to frontend
-}
 
-/* responsible for managing combat state of combat
- * */
-struct Team<'a> {
-    stats: Stats,
-    skills: &'a[Skill;4],
-    combos: &'a[Combo;4],
-    deffenses: Vec<&'static Skill>,
-    attacks: Vec<&'static Skill>,
+//used for rendering/displaying to the screen
+#[derive(Serialize, Deserialize,Clone, Copy)]
+struct Glyph {
+    value:u8,
+    color:u32,
+    alpha:u8,
 }
+//TODO add operator overload when array?
 
-impl<'a> Team<'a> {
-    fn preview(){} //returns a preview of stats, for team
-    fn enque_turn() {}
-    fn end_turn() {}
-    fn apply_dmg() {}
+trait Entity {
+    fn render(&self) -> Glyph;
+    fn get_mut(&mut self) -> &mut Glyph;
 }
 
 
@@ -100,49 +159,43 @@ impl<'a> Team<'a> {
  * they are incharge of interacting with other enties
  * incharge of generating data for combat state stored in team
  * */
-struct Entity {
-    glyph: Glyph,
-    max_stats: Stats,
-    items:Vec<Item>,
-    skills:Vec<&'static Skill>,
-    combos:Vec<&'static Combo>,
-    eqpt_skills:[&'static Skill;4],
-    eqpt_combos:[&'static Combo;4],
-    //TODO add dialog
+struct Actor { glyph: Glyph }
+impl Entity for Actor{
+    fn render(&self) -> Glyph { self.glyph }
+    fn get_mut(&mut self) -> &mut Glyph {&mut self.glyph}
 }
+impl Actor { }
 
-impl Entity {
-    fn render_items(){}
-    fn render_combos(){}
-    fn render_skills(){}
-    fn render_eqpt(){}
+struct Tile { glyph:Glyph, collision:bool }
+impl Entity for Tile {
+    fn get_mut(&mut self) -> &mut Glyph { &mut self.glyph}
+    fn render(&self) -> Glyph { self.glyph }
 }
-
-
-struct Tile {
-    glyph:Glyph,
-    collision:bool
-}
-
 struct Item { 
+   glyph: Glyph,
    name: &'static str,
    modifyer: Stats,
    consumable:bool,
+}
+impl Entity for Item {
+    fn get_mut(&mut self) -> &mut Glyph { &mut self.glyph}
+    fn render(&self) -> Glyph { self.glyph }
 }
 
 /* these are structs used to define a behabior of a projectile,
  * the life time, current step in animation...etc,
  * these aso contain a index to a gloabl array of animation functions that would be 
  * called by the world
- * */
 #[derive(Default)]
 struct Projectile {
     step: i32,
     life: i32,
     index: i32,
+    spread: i32,
     //FIXME add area
 }
 impl Projectile {
+    //TODO i could use recursion to update the life time of these files
     pub fn age(&mut self)->bool {
        self.life -= 1;
        return self.life <= 0
@@ -150,17 +203,29 @@ impl Projectile {
     fn on_hit(&self, _target:&Entity){}
     fn render(){}
 }
+* */
 
 #[derive(PartialEq, Eq)]
 struct Pos {
+    //TODO enforce being topleft coords 0,0 -> width,height
+    //Stop roll over 
     x:i32, //column
     y:i32  //row
 }
 
+impl Pos {
+    //TODO add a step
+    pub fn approch<'a>(&mut self, dest: &'a Pos) {
+        let diff: Pos = Pos {x: dest.x - self.x, y:dest.y - self.y};
+        self.y += if diff.y > 0 {1} else if diff.y < 0 {-1} else {diff.y};
+        self.x += if diff.x > 0 {1} else if diff.x < 0 {-1} else {diff.x};
+    }
+}
+
 struct WorldEntity {
-    entity: Entity,
+    entity: Box<dyn Entity>,
     location: Pos,
-    destination: Pos
+    destination: Option<Pos>,
 }
 
 
@@ -169,32 +234,37 @@ struct WorldEntity {
  * */
 struct World<'a>{
     //TODO check if muts are needed here
+    //
+    //FIXME i dont like haveing all this extra stuff
     entites:Vec<&'a mut WorldEntity>,
-    tiles:Vec<(&'a Tile,Pos)>,
-    items:Vec<(&'a Item,Pos)>,
-    t_player:Option<Team<'a>>,
-    t_enemy:Option<Team<'a>>,
-    projectiles:Vec<(&'a mut Projectile, Pos)>,
+    //TODO refresh on how to change types
+
+    //TODO make a view struct i.e. u8,u8,u32
+
+    //dimentions for world view and overall stuff
     v_width:usize,
     v_height:usize,
+    w_width:usize,
+    w_height:usize,
 }
 const PLAYER_ENTITY_INDEX:usize = 0;
 impl<'a> World<'a> {
     fn step (&mut self) {
         for _i in 0..self.entites.len() {
-            let mut _e = &self.entites[_i];
-            if _e.location != _e.destination {
-                //approch to destination
+            let mut _e = &mut self.entites[_i];
+            if let Some(dest) = &_e.destination {
+                if _e.location != *dest {
+                    _e.location.approch(dest);
+                }
             }
         }
+    }
 
-        for _i in 0..self.projectiles.len() {
-            let mut _p = &self.projectiles[_i];
-        }
+    fn get_view() {
+
     }
 }
 
-pub fn get_stats(){}
 pub fn get_preview(){}
 pub fn get_skills(){}
 pub fn get_combos(){}
@@ -202,24 +272,20 @@ pub fn step(){}
 
 static TILES: [Tile;3] = [
     Tile{
-        glyph:Glyph{value:'.',color:[0.5,0.5,0.5,1.0]},
+        glyph:Glyph{value:b'.',color:0xb9a8a4,alpha:1},
         collision: false
     },
     Tile{
-        glyph:Glyph{value:'|',color:[0.5,0.5,0.5,1.0]},
+        glyph:Glyph{value:b'|',color:0x0,alpha:1},
         collision: true
     },
     Tile{
-        glyph:Glyph{value:'-',color:[0.5,0.5,0.5,1.0]},
+        glyph:Glyph{value:b'-',color:0x0 , alpha:1}, //TODO make consts for color values
         collision: true
     }
 ];
 
 //TODO maybe make a struct just for display purposeses?
-
-type Animation= fn(i32,&mut Pos);
-fn ani_example(_step:i32,_pos:&mut Pos) { }
-static ANIMATIONS: [Animation;1] = [ ani_example ];
 
 static SKILLS: [Skill;1] = [
     Skill {
@@ -229,20 +295,21 @@ static SKILLS: [Skill;1] = [
         effect: Stats{hp:0.0,sp:0.0,status:[0]},
         deffense:false,
         modifer:false,
-        projectile: Projectile{
-            step:0,
-            life:0,
-            index:0 //index in the ANIMATIONS const
-        },
     }
 ];
 
-#[wasm_bindgen]
-extern "C" {
-    fn alert(s: &str);
-}
 
-#[wasm_bindgen]
-pub fn greet() {
-    alert("Hello, simulation!");
+/*
+ * lets define our rendering output/pipeline 
+ * we will output a u8 buffer and a u32 buffer
+ * i.e. let color:u32 = 0XFFFF
+ *      let value:u8  = b'h'
+ */
+//
+// pub unsafe fn greet() {
+//     alert("Hello, simulation!");
+// }
+
+#[no_mangle]
+pub unsafe extern "C" fn hello_world() {
 }

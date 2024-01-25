@@ -1,65 +1,22 @@
 #![allow(dead_code)]
 mod utils;
-use std::{ops, f32};
-use serde::{Deserialize, Serialize};
+mod skills; 
+mod world;
+mod entities;
+mod stats;
+mod render;
+mod maps;
+
+use stats::Stats;
+use skills::Skill;
+use entities::*;
+use render::RenderData;
 
 //TODO add skill and  animation static objects
 //TODO fill out all other functions
 //TODO add rendering functionality
 
-#[derive(Default, Serialize, Deserialize, Clone, Copy)]
-pub struct Stats {
-    hp: f32,
-    sp: f32,
-    status:[i32;1]
-    //FIXME add speed/enum
-}
-
-impl ops::AddAssign for Stats {
-    fn add_assign(&mut self, rhs: Self) {
-        self.hp += rhs.hp;
-        self.sp += rhs.sp;
-        for i in 0..=self.status.len() {
-            self.status[i] += rhs.status[i]
-        }
-    }
-}
-
-impl ops::MulAssign for Stats {
-    fn mul_assign(&mut self, rhs: Self) {
-        self.hp *= rhs.hp;
-        self.sp *= rhs.sp;
-    }
-}
-
-impl ops::SubAssign for Stats {
-    fn sub_assign(&mut self, rhs: Self) {
-        //auto gaurd
-        self.hp -= rhs.hp;
-        if self.sp - rhs.sp < 0.0 {
-            self.hp += self.sp - rhs.sp;
-            self.sp = 0.0;
-        } 
-        else {
-            self.sp -= rhs.sp;
-        }
-        for i in 0..=self.status.len() {
-            self.status[i] -= rhs.status[i]
-        }
-    }
-}
-
 //TODO maybe remove serde here and make special deisplay objects or json?
-#[derive(Serialize, Deserialize)]
-pub struct Skill {
-    cost: Stats,
-    effect: Stats,
-    modifer: bool,
-    deffense: bool,
-    name: &'static str,
-    range: i32,
-    //TODO add projectile
-}
 
 /*
  * what if for skills and combos we just use srede and Serialize the data?
@@ -135,53 +92,16 @@ pub struct Skill {
  *
  */
 
-struct Combo {
-    combo:Vec<&'static Skill>,
-    index: usize
-}
 
 //used for rendering/displaying to the screen
-#[derive(Serialize, Deserialize,Clone, Copy)]
-struct Glyph {
-    value:u8,
-    color:u32,
-    alpha:u8,
-}
 //TODO add operator overload when array?
 
-trait Entity {
-    fn render(&self) -> Glyph;
-    //would be used somehow with a render/animtaion function
-    fn get_mut(&mut self) -> &mut Glyph;
-}
 
 
 /* these hold all the data for a npc
  * they are incharge of interacting with other enties
  * incharge of generating data for combat state stored in team
  * */
-struct Actor { glyph: Glyph }
-impl Entity for Actor{
-    fn render(&self) -> Glyph { self.glyph }
-    fn get_mut(&mut self) -> &mut Glyph {&mut self.glyph}
-}
-impl Actor { }
-
-struct Tile { glyph:Glyph, collision:bool }
-impl Entity for Tile {
-    fn get_mut(&mut self) -> &mut Glyph { &mut self.glyph}
-    fn render(&self) -> Glyph { self.glyph }
-}
-struct Item { 
-   glyph: Glyph,
-   name: &'static str,
-   modifyer: Stats,
-   consumable:bool,
-}
-impl Entity for Item {
-    fn get_mut(&mut self) -> &mut Glyph { &mut self.glyph}
-    fn render(&self) -> Glyph { self.glyph }
-}
 
 /* these are structs used to define a behabior of a projectile,
  * the life time, current step in animation...etc,
@@ -206,28 +126,8 @@ impl Projectile {
 }
 * */
 
-#[derive(PartialEq, Eq)]
-struct Pos {
-    //TODO enforce being topleft coords 0,0 -> width,height
-    //Stop roll over 
-    x:i32, //column
-    y:i32  //row
-}
 
-impl Pos {
-    //TODO add a step
-    pub fn approch<'a>(&mut self, dest: &'a Pos) {
-        let diff: Pos = Pos {x: dest.x - self.x, y:dest.y - self.y};
-        self.y += if diff.y > 0 {1} else if diff.y < 0 {-1} else {diff.y};
-        self.x += if diff.x > 0 {1} else if diff.x < 0 {-1} else {diff.x};
-    }
-}
 
-struct MobileEntity {
-    entity: Box<dyn Entity>,
-    location: Pos,
-    destination: Option<Pos>,
-}
 //cc likes to seprate things to there own stuff 
 //items he seprates as well
 //
@@ -242,7 +142,6 @@ struct MobileEntity {
 //
 //
 //you might feel lag!!!
-
 
 
 /* responsible for postions, 
@@ -335,82 +234,65 @@ struct MobileEntity {
      *
      *
  * */
-struct World<'a>{
-    //TODO check if muts are needed here
-    //
-    //FIXME i dont like haveing all this extra stuff
-    entites:Vec<&'a mut MobileEntity>,
-    //TODO refresh on how to change types
-
-    //TODO make a view struct i.e. u8,u8,u32
-
-    //dimentions for world view and overall stuff
-    width:usize,
-    height:usize,
-}
 const PLAYER_ENTITY_INDEX:usize = 0;
-impl<'a> World<'a> {
-    fn step (&mut self) {
-        /*
-         * in game dev anything that dose not fall into 
-         * players view, they get turned off 
-         *
-         * in sim games they use numbers
-         *      empire a & b are fighting
-         *      those ships/missles
-         *          they exist as a number
-         *          basic struts.... numbers will play
-         *          while they fight, and get a battle outcome
-         *  obj culling -> its useally reffered to visally 
-         *  but it works in code 
-         *
-         *  when the players, rng whats in the room,
-         *  based on inputs..........
-         *
-         *  check if rust manages the functions in 
-         *  look up rust garbage disposal
-         *
-         *  CCNOTES 
-         *  collison based system/hit based 
-         *      (number based on chance)
-         *
-         *  ? how do i manage combat system
-         *  make sure you have, a max value 
-         *  @ inside the combat
-         *
-         *   
-         */
-        for _i in 0..self.entites.len() {
-            let mut _e = &mut self.entites[_i];
-            if let Some(dest) = &_e.destination {
-                if _e.location != *dest {
-                    _e.location.approch(dest);
-                }
-            }
-        }
-    }
+// impl<'a> World<'a> {
+//     fn step (&mut self) {
+//         /*
+//          * in game dev anything that dose not fall into 
+//          * players view, they get turned off 
+//          *
+//          * in sim games they use numbers
+//          *      empire a & b are fighting
+//          *      those ships/missles
+//          *          they exist as a number
+//          *          basic struts.... numbers will play
+//          *          while they fight, and get a battle outcome
+//          *  obj culling -> its useally reffered to visally 
+//          *  but it works in code 
+//          *
+//          *  when the players, rng whats in the room,
+//          *  based on inputs..........
+//          *
+//          *  check if rust manages the functions in 
+//          *  look up rust garbage disposal
+//          *
+//          *  CCNOTES 
+//          *  collison based system/hit based 
+//          *      (number based on chance)
+//          *
+//          *  ? how do i manage combat system
+//          *  make sure you have, a max value 
+//          *  @ inside the combat
+//          *
+//          *   
+//          */
+//         for _i in 0..self.entites.len() {
+//             let mut _e = &mut self.entites[_i];
+//             if let Some(dest) = &_e.destination {
+//                 if _e.location != *dest {
+//                     _e.location.approch(dest);
+//                 }
+//             }
+//         }
+//     }
+//
+//     fn get_view() {
+//
+//     }
+// }
 
-    fn get_view() {
-
-    }
-}
-
-pub fn get_preview(){}
-pub fn get_skills(){}
-pub fn get_combos(){}
-pub fn step(){}
 
 static TILES: [Tile;3] = [
     Tile{
-        glyph:Glyph{value:b'.',color:0xb9a8a4,alpha:1},
+        glyph:RenderData{value:b'.',color:0xb9a8a4,alpha:1},
         collision: false
     },
     Tile{
-        glyph:Glyph{value:b'|',color:0x0,alpha:1},
+        glyph:RenderData{value:b'|',color:0x0,alpha:1},
         collision: true
     },
     Tile{
-        glyph:Glyph{value:b'-',color:0x0 , alpha:1}, //TODO make consts for color values
+        glyph:RenderData{value:b'-',color:0x0 , alpha:1}, //TODO make consts for color values
         collision: true
     }
 ];

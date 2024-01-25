@@ -7,6 +7,7 @@ edition = "2021"
 crate-type = ["cdylib"]
 
 [dependencies]
+bendy = {version="0.3.3", features = ["std", "serde"]}
 serde = { version = "^1.0", features = ["derive"] }
 
 [profile.release]

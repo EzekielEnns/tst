@@ -311,5 +311,28 @@ static SKILLS: [Skill;1] = [
 // }
 
 #[no_mangle]
-pub unsafe extern "C" fn hello_world() {
+pub unsafe extern "C" fn hello_world() -> *mut u8 {
+    let mut buf = bendy::serde::to_bytes(&SKILLS[0]).unwrap();
+    let ptr = buf.as_mut_ptr();
+
+    std::mem::forget(buf);
+    return ptr;
 }
+
+#[no_mangle]
+pub unsafe extern "C" fn len() -> usize {
+    let buf = bendy::serde::to_bytes(&SKILLS[0]).unwrap();
+    return buf.len();
+}
+
+/*
+//using 
+//std::mem::drop we can deollocate the vec
+//the nice thing here is that we only have to allocate a 
+//struct for displaying the current skills  once per combat encournter 
+//or per equiptment 
+//ooooooooh i can recylce!!!!!!!!!
+//
+//take the pointer in ->>> you can resize the vec too so that works out as well
+//do a Vec::from_raw_parts() 
+*/

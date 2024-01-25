@@ -151,6 +151,7 @@ struct Glyph {
 
 trait Entity {
     fn render(&self) -> Glyph;
+    //would be used somehow with a render/animtaion function
     fn get_mut(&mut self) -> &mut Glyph;
 }
 
@@ -222,34 +223,163 @@ impl Pos {
     }
 }
 
-struct WorldEntity {
+struct MobileEntity {
     entity: Box<dyn Entity>,
     location: Pos,
     destination: Option<Pos>,
 }
+//cc likes to seprate things to there own stuff 
+//items he seprates as well
+//
+//seprate things out 
+//  do one thing and one thing only!!
+//
+//i.e. i could make items seprate
+//when a collison happens they pick it up
+//
+//tiles dont move, and doors could just be a 
+//tiles dont need a dest they dont move 
+//
+//
+//you might feel lag!!!
+
 
 
 /* responsible for postions, 
  * storing game sate/like combat
+ *
+ *
+ * world is my combat as well,
+ *      how cc dose it::
+     *      setup a world base,
+     *      this is your main map
+     *      then you have certain variousions
+     *      changing it 
+     *
+     *
+     *      one combat world, one exploration world
+     *      swap based on that....
+     *
+     *  two structs a combat struct and a exploration struct
+     *
+     *  they both impl the trait World which has step and 
+     *  stuff like that, so copy over a the reffrence to the 
+     *  renderable world..... based on the current mode.....
+     *
+     *  we can also save this world data in a display struct
+     *  so like struct Save {exploration, combat};
+     *  that can then be serilzed using bencoding
+     *
+     *  ------
+     *  runtime is very important in games
+     *  ------
+     *  ? how do i render/generate the world for the player
+     *
+     *  so there is static and procedal generation.....
+     *  gneration of world happens at the start of the game only
+     *  your loading a saved state of that world
+     *
+     *  generation-- one time one off event
+     *
+     *  when player walks through a door, 
+     *  i guess im asking for spawning.........
+     *  so this is a tile based game::
+     *      tiles are difinitive, x and y coord,
+     *
+     *  walk into a room the trigger will be the entry
+     *  the items in the room will spawn items,tiles 
+     *  will have a flag that belongs to room nuber one 
+     *  
+     *  rember to focus on numbers not objects,
+     *  so you could assing objects as numbers to rooms
+     *  and ranomly spawn items and enemeies
+     *
+     *  set a room to spawn items and enemeies in room
+     *  the moment you go out the door, 
+     *          a visted room should not have its 
+     *          objects changed/enemies
+     *          once visted should not change
+     *  how do i design a struct for that, 
+     *  virtual struct called room, store this this and 
+     *  this tile, make up the room,
+     *  this one eneter trigger spawn stuff, then modify 
+     *  whats in the room and store that....
+     *
+     *  cull the objects that need to stay.....
+     *  so for const world, store the eneties in the mobile
+     *  array and they can live else where, flag 
+     *  non culled objects and render/loop throught them
+     *
+     *  need a buffer for view/render
+     *
+     *
+     *  so are think about how you map is made/load that map
+     *  into the world/visible range
+     *  do a double buffer, where monsters loose intrest 
+*  and then move to static/map placement
+*  they go back to numbers
+*
+*
+*  baseclass for entites that can be randomized...
+*
+*  so you have a static world/thing 
+*  bunch of float, or string
+*
+*
+*  the projectiles will just switch modes, when hit/ on collison
+*
+*
+*  when damage happens do the damage based on the classes that 
+*  deal with damage, i.e. skill dose dmg but not projectiles
+*  only deal with moving postion, and animation and collison
+     *
+     *
  * */
 struct World<'a>{
     //TODO check if muts are needed here
     //
     //FIXME i dont like haveing all this extra stuff
-    entites:Vec<&'a mut WorldEntity>,
+    entites:Vec<&'a mut MobileEntity>,
     //TODO refresh on how to change types
 
     //TODO make a view struct i.e. u8,u8,u32
 
     //dimentions for world view and overall stuff
-    v_width:usize,
-    v_height:usize,
-    w_width:usize,
-    w_height:usize,
+    width:usize,
+    height:usize,
 }
 const PLAYER_ENTITY_INDEX:usize = 0;
 impl<'a> World<'a> {
     fn step (&mut self) {
+        /*
+         * in game dev anything that dose not fall into 
+         * players view, they get turned off 
+         *
+         * in sim games they use numbers
+         *      empire a & b are fighting
+         *      those ships/missles
+         *          they exist as a number
+         *          basic struts.... numbers will play
+         *          while they fight, and get a battle outcome
+         *  obj culling -> its useally reffered to visally 
+         *  but it works in code 
+         *
+         *  when the players, rng whats in the room,
+         *  based on inputs..........
+         *
+         *  check if rust manages the functions in 
+         *  look up rust garbage disposal
+         *
+         *  CCNOTES 
+         *  collison based system/hit based 
+         *      (number based on chance)
+         *
+         *  ? how do i manage combat system
+         *  make sure you have, a max value 
+         *  @ inside the combat
+         *
+         *   
+         */
         for _i in 0..self.entites.len() {
             let mut _e = &mut self.entites[_i];
             if let Some(dest) = &_e.destination {
@@ -286,7 +416,9 @@ static TILES: [Tile;3] = [
 ];
 
 //TODO maybe make a struct just for display purposeses?
-
+//so these are good, this dosent harm or hinder anything
+//rember the differnce between static and cosntant, 
+//the base skill should be static, they wont change
 static SKILLS: [Skill;1] = [
     Skill {
         cost:  Stats{hp:0.0,sp:0.0,status:[0]},       
@@ -325,8 +457,7 @@ pub unsafe extern "C" fn len() -> usize {
     return buf.len();
 }
 
-/*
-//using 
+/* using 
 //std::mem::drop we can deollocate the vec
 //the nice thing here is that we only have to allocate a 
 //struct for displaying the current skills  once per combat encournter 

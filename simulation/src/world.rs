@@ -85,13 +85,15 @@ impl World{
         if let Some(actor) = self.actors.get(new)? {
             //TODO store dialog into dialog static pointer if not hostile
             if actor.is_hostile {
-                //start swap to combat mode
+                //TODO start swap to combat mode
                 return Some(false);
            }
         }
-        //TODO fix this
         else if let Some(item) = self.items.get(new)? {
-            self.actors[old]?.items.push(self.items.remove(new)?);
+            if let Some(actor) = self.actors[old].as_mut() {
+                actor.items.push(*item);
+            }
+            self.items[new] = None;
         }
         self.actors.swap(old,new);
         return Some(true);

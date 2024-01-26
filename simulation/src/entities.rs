@@ -28,6 +28,7 @@ impl Entity for Tile {
     fn get_mut(&mut self) -> &mut RenderData { &mut self.glyph}
     fn render(&self) -> RenderData { self.glyph }
 }
+#[derive(Clone, Copy)]
 pub struct Item { 
    pub glyph: RenderData,
    pub name: &'static str,

@@ -10,7 +10,7 @@ mod maps;
 use stats::Stats;
 use skills::Skill;
 use entities::*;
-use render::RenderData;
+use render::RenderValue;
 
 //TODO add skill and  animation static objects
 //TODO fill out all other functions
@@ -282,20 +282,20 @@ const PLAYER_ENTITY_INDEX:usize = 0;
 // }
 
 
-static TILES: [Tile;3] = [
-    Tile{
-        glyph:RenderData{value:b'.',color:0xb9a8a4,alpha:1},
-        collision: false
-    },
-    Tile{
-        glyph:RenderData{value:b'|',color:0x0,alpha:1},
-        collision: true
-    },
-    Tile{
-        glyph:RenderData{value:b'-',color:0x0 , alpha:1}, //TODO make consts for color values
-        collision: true
-    }
-];
+// static TILES: [Tile;3] = [
+//     Tile{
+//         render_value:RenderValue{text:b'.',color:0xb9a8a4,alpha:1},
+//         collision: false
+//     },
+//     Tile{
+//         render_value:RenderValue{text:b'|',color:0x0,alpha:1},
+//         collision: true
+//     },
+//     Tile{
+//         render_value:RenderValue{text:b'-',color:0x0 , alpha:1}, //TODO make consts for color values
+//         collision: true
+//     }
+// ];
 
 //TODO maybe make a struct just for display purposeses?
 //so these are good, this dosent harm or hinder anything

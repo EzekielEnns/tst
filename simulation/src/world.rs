@@ -1,52 +1,16 @@
 
-use crate::entities::{Item, Actor, Tile};
-
-// #[derive(PartialEq, Eq)]
-// pub struct Pos {
-//     //TODO enforce being topleft coords 0,0 -> width,height
-//     //Stop roll over 
-//     pub x:i32, //column
-//     pub y:i32  //row
-// }
-//
-// impl Pos {
-//     //TODO add a step
-//     pub fn approch<'a>(&mut self, dest: &'a Pos) {
-//         let diff: Pos = Pos {x: dest.x - self.x, y:dest.y - self.y};
-//         self.y += if diff.y > 0 {1} else if diff.y < 0 {-1} else {diff.y};
-//         self.x += if diff.x > 0 {1} else if diff.x < 0 {-1} else {diff.x};
-//     }
-// }
-//
-// trait GetPos {
-//     fn get_local(&self) -> Pos;
-// }
-//
-// pub struct MobileEntity<T:Entity> {
-//     pub entity: T,
-//     pub location: Pos,
-//     pub destination: Option<Pos>,
-// }
-// impl GetPos for MobileEntity{
-//    fn get_local(&self) -> Pos {self.location} 
-// }
-//
-// pub struct StationayEntity<T: Entity>{
-//     pub location: Pos,
-//     pub entity: T,
-// }
-// impl GetPos for StationayEntity {
-//    fn get_local(&self) -> Pos {self.location} 
-// }
+use crate::{entities::{Item, Actor, Tile}, render::RenderData};
 //TODO add animated entity
-
 pub struct Pos {x:usize,y:usize}
 
+//gets the postion based on a index
 fn get_pos(b:Pos,i:usize)->Pos{
         let column = i % b.x;
         let row =  (i- (i % b.x)) / b.x; 
         Pos {x:column, y:if row > b.y { row % b.y} else {row}}
 }
+
+//gets the index based on a postion 
 fn get_index(b:&Pos,p:&Pos)->usize { p.y * b.y + p.x }
 
 /*
@@ -59,10 +23,11 @@ pub struct World{
     pub items: Vec<Option<Item>>,
     pub tiles: Vec<Option<Tile>>,   
     pub dim: Pos,
-
+    pub render_data: RenderData
     //TODO add combat states i.e. enemy team and player team
 }
 
+enum RenderType{ ACTORS=0,ITEMS,TILES}
 impl World{
     fn new(width:usize,height:usize)->World{
         let len = width*height;
@@ -71,6 +36,7 @@ impl World{
             actors: Vec::with_capacity(len),
             items: Vec::with_capacity(len),
             tiles: Vec::with_capacity(len),
+            render_data: RenderData::new(len)
         }
     }
 
@@ -98,32 +64,51 @@ impl World{
         self.actors.swap(old,new);
         return Some(true);
     }
-    unsafe fn render_init(&self)-> *mut u8 {
-        todo!() 
-        /* setup a bunch of pointers for rendering 
-         * then pointer to that array in js
-         *
-         *
-         * it would look something like this VVVVVVVVV
-         * bot obviliouly different
-         */
-        // let ptrs = [
-        //     self.actors.as_ptr(),
-        //     self.items.as_ptr(),
-        //     self.tiles.as_ptr(),
-        // ]
+
+    //lets js read the render_data struct from the world
+    unsafe fn render_alloc(&self)-> *mut u8 {
+        let mut buf = bendy::serde::to_bytes(&self.render_data).unwrap();
+        let ptr = buf.as_mut_ptr();
+        std::mem::forget(buf);
+        return ptr;
     }
 
-    unsafe fn render_actors(&self,color:*mut u8,text:* mut u8, alpha:*mut u8){
+
+    //updates the render values inside the render_data
+    unsafe fn render(&mut self, v:RenderType){
+        //TODO turn into macro
+        let mut _data_t = match v {
+            RenderType::ACTORS => {self.render_data.actors.get_textures();}
+            RenderType::TILES => {self.render_data.actors.get_textures();}
+            RenderType::ITEMS => {self.render_data.actors.get_textures();}
+        };
+        //TODO check for reszing 
+        //get all buffer data like so
+        let mut _data_t = self.render_data.actors.get_textures();
+        let mut _data_c = self.render_data.actors.get_alpha();
+        let mut _data_a = self.render_data.actors.get_colors();
+        let mut _data_l = self.render_data.actors.get_locations();
+        
+        //update the values later based on actor glyphs
+        for i in 0..self.len() {
+            if let Some(_actor) = &self.actors[i] {
+                //TODO set the value using _actor.render_value.text
+                //TODO modify the location values via the index i 
+            }
+
+        }
+    }
+    pub unsafe fn render_actors(&self){
         //updates buffers
     }
-    unsafe fn render_items(&self,color:*mut u8,text:* mut u8, alpha:*mut u8){
+    pub unsafe fn render_items(&self){
         //updates buffers
     }
-    unsafe fn render_tiles(&self,color:*mut u8,text:* mut u8, alpha:*mut u8){
+    pub unsafe fn render_tiles(&self){
         //updates buffers
     }
 }
+
 
 //determins if in range
 //moves entities and takes sp

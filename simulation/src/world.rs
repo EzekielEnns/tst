@@ -85,7 +85,6 @@ impl World{
         //TODO check for reszing 
         //get all buffer data like so
         let mut _data_t = self.render_data.actors.get_textures();
-        let mut _data_c = self.render_data.actors.get_alpha();
         let mut _data_a = self.render_data.actors.get_colors();
         let mut _data_l = self.render_data.actors.get_locations();
         

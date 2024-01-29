@@ -26,21 +26,19 @@ pub struct RenderBuffers {
     pub textures: Buffer,
     pub colors: Buffer,
     pub locations: Buffer,
-    pub alphas: Buffer,
     pub len: usize
 }
 
-pub enum BINDEX { TEXTURES=0,LOCATIONS,COLORS,ALPHA }
+pub enum BINDEX { TEXTURES=0,LOCATIONS,COLORS}
 
 impl RenderBuffers {
-    fn new(len:usize, b:&[*mut u8;4])->RenderBuffers {
+    fn new(len:usize, b:&[*mut u8;3])->RenderBuffers {
         RenderBuffers {
             len,
             //TODO make this easier to deal with
             colors:Buffer::new(b[BINDEX::COLORS as usize]), 
             textures: Buffer::new(b[BINDEX::TEXTURES as usize]),
             locations:Buffer::new(b[BINDEX::LOCATIONS as usize]),
-            alphas:Buffer::new(b[BINDEX::ALPHA as usize]),
         }
     }
     pub unsafe fn get_textures(&mut self)-> Vec<u8>{
@@ -48,9 +46,6 @@ impl RenderBuffers {
     }
     pub unsafe fn get_colors(&mut self)-> Vec<u8>{
         Vec::from_raw_parts(self.colors.ptr,self.len,self.len)
-    }
-    pub unsafe fn get_alpha(&mut self)-> Vec<u8>{
-        Vec::from_raw_parts(self.alphas.ptr,self.len,self.len)
     }
     pub unsafe fn get_locations(&mut self)-> Vec<u8>{
         Vec::from_raw_parts(self.locations.ptr,self.len,self.len)
@@ -77,9 +72,9 @@ macro_rules! create_buffers {
 impl RenderData {
     pub fn new(len:usize)-> RenderData {
         RenderData {
-            map: create_buffers!(len,4),
-            actors: create_buffers!(0,4),
-            items: create_buffers!(0,4),
+            map: create_buffers!(len,3),
+            actors: create_buffers!(0,3),
+            items: create_buffers!(0,3),
         }
     }
     pub fn grow_actors(&mut self, len: usize) {

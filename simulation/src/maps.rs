@@ -1,4 +1,17 @@
 //TODO this file is for generating content to store in world
+
+use crate::entities::{Tile, Item, Actor};
+
+
+pub trait Generate {
+    fn generate(&mut self, func: fn(actors: &mut [Option<Actor>],items:&mut [Option<Item>],tiles:&mut [Tile]));
+}
+
+pub fn first_test_world(actors: &mut [Option<Actor>],items:&mut [Option<Item>],tiles:&mut [Tile]){
+    //TODO fill tiles with . and | or - on the tops of the world 
+    //TODO add a player
+    //TODO add a coin
+}
 /*
 use serde::{Serialize, Deserialize};
 

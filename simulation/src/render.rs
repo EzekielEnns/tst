@@ -4,7 +4,6 @@ use serde::{Deserialize, Serialize, ser::SerializeStruct};
 pub struct RenderValue {
     pub text:u8,
     pub color:u8,
-    pub alpha:u8,
 }
 
 //this is a struct just cause its handly 

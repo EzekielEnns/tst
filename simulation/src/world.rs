@@ -21,7 +21,7 @@ fn get_index(b:&Pos,p:&Pos)->usize { p.y * b.y + p.x }
 pub struct World{ 
     pub actors: Vec<Option<Actor>>, 
     pub items: Vec<Option<Item>>,
-    pub tiles: Vec<Option<Tile>>,   
+    pub tiles: Vec<Tile>,   
     pub dim: Pos,
     pub render_data: RenderData
     //TODO add combat states i.e. enemy team and player team
@@ -45,8 +45,8 @@ impl World{
         let new = get_index(&self.dim,&new_pos);
         let old =  get_index(&self.dim,&old_pos);
         //check for collison
-        if let Some(tile) = self.tiles.get(new)? {
-            if tile.collision { return Some(false) }
+        if self.tiles[new].collision {
+            return Some(false)
         }
         if let Some(actor) = self.actors.get(new)? {
             //TODO store dialog into dialog static pointer if not hostile
@@ -76,35 +76,72 @@ impl World{
 
     //updates the render values inside the render_data
     unsafe fn render(&mut self, v:RenderType){
-        //TODO turn into macro
-        let mut _data_t = match v {
-            RenderType::ACTORS => {self.render_data.actors.get_textures();}
-            RenderType::TILES => {self.render_data.actors.get_textures();}
-            RenderType::ITEMS => {self.render_data.actors.get_textures();}
+        let mut value = match v {
+            RenderType::ACTORS => {self.render_data.actors.get_textures()}
+            RenderType::TILES => {self.render_data.map.get_textures()}
+            RenderType::ITEMS => {self.render_data.items.get_textures()}
         };
-        //TODO check for reszing 
-        //get all buffer data like so
-        let mut _data_t = self.render_data.actors.get_textures();
-        let mut _data_a = self.render_data.actors.get_colors();
-        let mut _data_l = self.render_data.actors.get_locations();
+        value.clear();
+        let mut color = match v {
+            RenderType::ACTORS => {self.render_data.actors.get_colors()}
+            RenderType::TILES => {self.render_data.map.get_colors()}
+            RenderType::ITEMS => {self.render_data.items.get_colors()}
+        };
+        color.clear();
+        let mut positions = match v {
+            RenderType::ACTORS => {self.render_data.actors.get_locations()}
+            RenderType::TILES => {self.render_data.map.get_locations()}
+            RenderType::ITEMS => {self.render_data.items.get_locations()}
+        };
+        positions.clear();
         
         //update the values later based on actor glyphs
         for i in 0..self.len() {
-            if let Some(_actor) = &self.actors[i] {
-                //TODO set the value using _actor.render_value.text
-                //TODO modify the location values via the index i 
-            }
+            match v {
+                RenderType::ACTORS => {
+                    if let Some(_actor) = &self.actors[i] {
+                        positions.push(i as u8);
+                        color.push(_actor.render_value.text);
+                        value.push(_actor.render_value.color);
+                    }
+                }
+                RenderType::ITEMS => {
+                    if let Some(item) = &self.items[i] {
+                        positions.push(i as u8);
+                        color.push(item.render_value.text);
+                        value.push(item.render_value.color);
+                    }
+                }
+                RenderType::TILES => {
+                    //TODO needs culling
+                    let tile = &self.tiles[i];
+                    positions.push(i as u8);
+                    color.push(tile.render_value.text);
+                    value.push(tile.render_value.color);
+                }
+            };
 
         }
+        match v {
+            RenderType::ITEMS => {
+                self.render_data.items.len = value.len(); 
+            }
+            RenderType::ACTORS => {
+                self.render_data.actors.len = value.len();
+            }
+            RenderType::TILES => {}
+        } 
     }
-    pub unsafe fn render_actors(&self){
-        //updates buffers
+    pub unsafe fn render_actors(&mut self){
+        self.render(RenderType::ACTORS);
     }
-    pub unsafe fn render_items(&self){
+    pub unsafe fn render_items(&mut self){
         //updates buffers
+        self.render(RenderType::ITEMS);
     }
-    pub unsafe fn render_tiles(&self){
+    pub unsafe fn render_tiles(&mut self){
         //updates buffers
+        self.render(RenderType::TILES);
     }
 }
 

@@ -4,14 +4,14 @@ use crate::{entities::{Item, Actor, Tile}, render::RenderData, maps::Generate};
 pub struct Pos {x:usize,y:usize}
 
 //gets the postion based on a index
-fn get_pos(b:Pos,i:usize)->Pos{
+pub fn get_pos(b:Pos,i:usize)->Pos{
         let column = i % b.x;
         let row =  (i- (i % b.x)) / b.x; 
         Pos {x:column, y:if row > b.y { row % b.y} else {row}}
 }
 
 //gets the index based on a postion 
-fn get_index(b:&Pos,p:&Pos)->usize { p.y * b.y + p.x }
+pub fn get_index(b:&Pos,p:&Pos)->usize { p.y * b.y + p.x }
 
 /*
  * mvp needs to have movment and combat 
@@ -144,7 +144,7 @@ impl World{
 }
 
 impl Generate for World {
-    fn generate(&mut self,func: fn(actors: &mut [Option<Actor>],items:&mut [Option<Item>],tiles:&mut [Tile])) {
-        func(&mut self.actors,&mut self.items,&mut self.tiles);
+    fn generate(&mut self,func: fn(dim: &Pos, actors: &mut [Option<Actor>],items:&mut [Option<Item>],tiles:&mut [Tile])) {
+        func(&self.dim,&mut self.actors,&mut self.items,&mut self.tiles);
     }
 }

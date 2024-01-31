@@ -23,6 +23,7 @@ impl Entity for Actor{
 }
 impl Actor { }
 
+#[derive(Clone, Copy)]
 pub struct Tile { pub render_value:RenderValue, pub collision:bool }
 impl Entity for Tile {
     fn get_mut(&mut self) -> &mut RenderValue { &mut self.render_value}

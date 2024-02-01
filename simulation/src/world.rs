@@ -14,6 +14,12 @@ pub fn get_pos(b:Pos,i:usize)->Pos{
 //gets the index based on a postion 
 pub fn get_index(b:&Pos,p:&Pos)->usize { p.y * b.y + p.x }
 
+pub fn move_player(wld: &mut World,new: usize){
+    if wld.move_actor(wld.player_index,new) {
+        wld.player_index = new;
+    }
+}
+
 /*
  * mvp needs to have movment and combat 
  * there dosnet need to be any items, things can be hard coded and worked in
@@ -25,13 +31,13 @@ pub struct World{
     pub tiles: Vec<Tile>,   
     pub dim: Pos,
     pub render_data: RenderData,
-    pub player_index: usize;
+    pub player_index: usize,
     //TODO add combat states i.e. enemy team and player team
 }
 
 enum RenderType{ ACTORS=0,ITEMS,TILES}
 impl World{
-    fn new(width:usize,height:usize)->World{
+    pub fn new(width:usize,height:usize)->World{
         let len = width*height;
         World {
             dim: Pos{y:height,x:width},
@@ -43,35 +49,35 @@ impl World{
         }
     }
     fn len(&self)->usize{self.dim.x*self.dim.y}
-    fn move_actor(&mut self, new_pos:Pos, old_pos:Pos) -> Option<bool> {
-        let new = get_index(&self.dim,&new_pos);
-        let old =  get_index(&self.dim,&old_pos);
+
+    //this needs some testing 
+    fn move_actor(&mut self, old:usize, new:usize) -> bool {
         //check for collison
         if self.tiles[new].collision {
-            return Some(false)
+            return false
         }
-        if let Some(actor) = self.actors.get(new)? {
+        if let Some(actor) = self.actors[new].as_ref() {
             //TODO store dialog into dialog static pointer if not hostile
             if actor.is_hostile {
                 //TODO start swap to combat mode
-                return Some(false);
+                return false;
            }
         }
-        else if let Some(item) = self.items.get(new)? {
+        else if let Some(item) = self.items[new] {
             if let Some(actor) = self.actors[old].as_mut() {
                 //TODO add a notification buffer 
                 //that will popup and tell the player what they picked up
-                actor.items.push(*item);
+                actor.items.push(item);
             }
             self.items[new] = None;
         }
         self.actors.swap(old,new);
-        return Some(true);
+        return true;
     }
 
     //TODO move to trait for sanity
     //lets js read the render_data struct from the world
-    unsafe fn render_alloc(&self)-> *mut u8 {
+    pub unsafe fn render_alloc(&self)-> *mut u8 {
         let mut buf = bendy::serde::to_bytes(&self.render_data).unwrap();
         let ptr = buf.as_mut_ptr();
         std::mem::forget(buf);
@@ -153,3 +159,4 @@ impl Generate for World {
         func(&self.dim,&mut self.actors,&mut self.items,&mut self.tiles);
     }
 }
+

@@ -1,9 +1,17 @@
 #![allow(dead_code)]
+/*
+turns out for some reason you cant send a array of pointers in wasm to 
+js......
+
+
+this means my current render system dose not work,
+and i will have to overcome this some how 
+*/
 
 
 use maps::{Generate, first_test_world};
 use once_cell::sync::Lazy;
-use world::{World, move_player};
+use world::{World, move_player, get_index, Pos};
 mod utils;
 mod skills; 
 mod world;
@@ -19,9 +27,8 @@ static mut WORLD: Lazy<World> = Lazy::new(|| {
 });
 
 #[no_mangle]
-pub unsafe extern "C" fn move_pc(new: usize) {
-    //moves player to specific spot
-    //sets player_index after doing move
+pub unsafe extern "C" fn move_pc(x:usize, y:usize ) {
+    let new = get_index(&WORLD.dim,&Pos {x,y});
     move_player(&mut WORLD,new);
 }
 
@@ -45,6 +52,18 @@ pub unsafe extern "C" fn update() {
     WORLD.render_items();
     WORLD.render_tiles();
 }
+
+#[no_mangle]
+pub unsafe extern "C" fn test() -> *mut *mut u8  {
+    let mut buf = vec![WORLD.render_data.actors.textures.ptr, 
+                    WORLD.render_data.actors.colors.ptr,
+                    WORLD.render_data.actors.locations.ptr
+    ];
+    let ptr = buf.as_mut_ptr();
+    std::mem::forget(buf);
+    ptr
+}
+
 
 #[cfg(test)]
 mod tests {

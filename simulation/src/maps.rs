@@ -1,8 +1,5 @@
 //TODO this file is for generating content to store in world
-
-use std::collections::VecDeque;
-
-use crate::{entities::{Tile, Item, Actor}, render::RenderValue, stats::Stats, world::Pos};
+use crate::{entities::{Tile, Item, Actor}, render::RenderValue, stats::Stats, world::{Pos, get_pos, get_index}};
 
 
 pub trait Generate {
@@ -35,7 +32,16 @@ pub fn first_test_world(dim: &Pos,actors: &mut [Option<Actor>],items:&mut [Optio
     //itterate through array see if index is in spot
     for i in 0..tiles.len() {
         //check if on dimentions
-        tiles[i] = floor.clone();
+        let pos = get_pos(*dim, i as usize);
+        if pos.y == 0 || pos.y == dim.y {
+            tiles[i] = top.clone();
+        }
+        else if pos.x == 0 || pos.x == dim.x {
+            tiles[i] = side.clone();
+        }
+        else {
+            tiles[i] = floor.clone();
+        }
     }
     
     //TODO add a player
@@ -47,7 +53,9 @@ pub fn first_test_world(dim: &Pos,actors: &mut [Option<Actor>],items:&mut [Optio
         items: Vec::new(),
         is_hostile: false,
     };
-    //TODO add a coin
+    let mut center = Pos{ x:dim.x/2,y:dim.y/2};
+    actors[get_index(&dim,&center)] = Some(player);
+
     let coin = Item {
         render_value: RenderValue {
             text: b'$',
@@ -57,60 +65,6 @@ pub fn first_test_world(dim: &Pos,actors: &mut [Option<Actor>],items:&mut [Optio
         modifyer: Stats::default(),
         consumable: false,
     };
+    center.y += 1; 
+    items[get_index(&dim, &center)] = Some(coin);
 }
-/*
-use serde::{Serialize, Deserialize};
-
-use crate::entities::{Entity, Actor, Item};
-use crate::world::{Pos};
-use crate::RenderData;
-
-pub fn generate_tiles(_target:&mut Explore) {
-
-}
-
-pub fn populate_room(_target:&mut Explore) {
-    //let test = GENFN[ROOMS[0][0].0 as usize]();
-}
-
-fn gen_rat(){
-    // Actor{
-    //     glyph: RenderData{
-    //         value:b'S',
-    //         color:0xFFFF,
-    //         alpha:255,
-    //     }
-    // }
-}
-// #[derive(Clone, Copy)]
-// enum G { Rat=0, }
-// type GActor = fn ()->Actor;
-// type GItem = fn ()->Item;
-//
-// static GEN_ACTOR_FN: [GActor;1] = [gen_rat];
-//
-// struct Room {
-//     actors: u8,
-//     a_fn: Vec<G>,
-//     items: u8,
-//     i_fn: Vec<G>,
-//     tiles: u8,
-//     t_fn: Vec<G>,
-// }
-//
-// static mut ROOMS:[[(G,u8);1];1] = [
-//     [(G::Rat,1)], 
-// ];
-//
-// //storing map state outside of actual placement 
-// unsafe fn load_value(enq:&mut Explore,_p:Pos,_room_id:usize,_entity_id:usize) {
-//     let e = GENFN[ROOMS[_room_id][_entity_id].0 as usize]();
-//     //TODO add a Entity trait enum for weather a 
-//     //entity is mobile or not
-//     enq.me.push(MobileEntity{
-//         entity: e,
-//         destination: None,
-//         location: _p,
-//     });
-// }
-*/

@@ -1,7 +1,8 @@
 
 use crate::{entities::{Item, Actor, Tile}, render::RenderData, maps::Generate};
 //TODO add animated entity
-pub struct Pos {x:usize,y:usize}
+#[derive(Clone, Copy)]
+pub struct Pos {pub x:usize, pub y:usize}
 
 //gets the postion based on a index
 pub fn get_pos(b:Pos,i:usize)->Pos{
@@ -23,7 +24,8 @@ pub struct World{
     pub items: Vec<Option<Item>>,
     pub tiles: Vec<Tile>,   
     pub dim: Pos,
-    pub render_data: RenderData
+    pub render_data: RenderData,
+    pub player_index: usize;
     //TODO add combat states i.e. enemy team and player team
 }
 
@@ -36,7 +38,8 @@ impl World{
             actors: Vec::with_capacity(len),
             items: Vec::with_capacity(len),
             tiles: Vec::with_capacity(len),
-            render_data: RenderData::new(len)
+            render_data: RenderData::new(len),
+            player_index: 0
         }
     }
     fn len(&self)->usize{self.dim.x*self.dim.y}
@@ -56,6 +59,8 @@ impl World{
         }
         else if let Some(item) = self.items.get(new)? {
             if let Some(actor) = self.actors[old].as_mut() {
+                //TODO add a notification buffer 
+                //that will popup and tell the player what they picked up
                 actor.items.push(*item);
             }
             self.items[new] = None;

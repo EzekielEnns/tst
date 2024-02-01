@@ -26,12 +26,13 @@ pub unsafe extern "C" fn move_pc(new: usize) {
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn alloc_buffers()-> *mut u8 {
-    WORLD.render_alloc()
-}
-#[no_mangle]
 pub unsafe extern "C" fn get_buffs(ptr: *mut u8, size: usize)-> *mut u8 {
-    WORLD.render_update(ptr,size)
+    if ptr == std::ptr::null_mut() || size == 0 {
+        WORLD.render_alloc()
+    } else {
+        //dose alloc and dealloc
+        WORLD.render_update(ptr,size)
+    }
 }
 #[no_mangle]
 pub unsafe extern "C" fn get_buff_len()-> usize{

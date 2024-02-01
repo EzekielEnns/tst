@@ -1,5 +1,5 @@
 
-use crate::{entities::{Item, Actor, Tile}, render::RenderData, maps::Generate};
+use crate::{entities::{Item, Actor, Tile}, render::{RenderData, RenderValue}, maps::Generate};
 //TODO add animated entity
 #[derive(Clone, Copy)]
 pub struct Pos {pub x:usize, pub y:usize}
@@ -41,9 +41,16 @@ impl World{
         let len = width*height;
         World {
             dim: Pos{y:height,x:width},
-            actors: Vec::with_capacity(len),
-            items: Vec::with_capacity(len),
-            tiles: Vec::with_capacity(len),
+            //TODO fix this so that i can use with_capacity
+            actors: vec![None; len],
+            items: vec![None; len],
+            tiles: vec![Tile {
+                render_value: RenderValue {
+                    text: b'.',
+                    color: 38,
+                },
+                collision: false,
+            }; len],
             render_data: RenderData::new(len),
             player_index: 0
         }
@@ -82,6 +89,16 @@ impl World{
         let ptr = buf.as_mut_ptr();
         std::mem::forget(buf);
         return ptr;
+    }
+    pub unsafe fn render_update(&self,ptr: *mut u8,size: usize)-> *mut u8 {
+        //clean up
+        let data = Vec::from_raw_parts(ptr,size,size);
+        std::mem::drop(data);
+        
+        self.render_alloc()
+    }
+    pub unsafe fn render_len(&self) -> usize {
+        bendy::serde::to_bytes(&self.render_data).unwrap().len()
     }
 
 
@@ -142,6 +159,7 @@ impl World{
             }
             RenderType::TILES => {}
         } 
+        println!("{}",value.len());
     }
     pub unsafe fn render_actors(&mut self){
         self.render(RenderType::ACTORS);
@@ -152,6 +170,11 @@ impl World{
     pub unsafe fn render_tiles(&mut self){
         self.render(RenderType::TILES);
     }
+    pub unsafe fn render_all(&mut self){
+        self.render_actors();
+        self.render_tiles();
+        self.render_items();
+    }
 }
 
 impl Generate for World {
@@ -159,4 +182,3 @@ impl Generate for World {
         func(&self.dim,&mut self.actors,&mut self.items,&mut self.tiles);
     }
 }
-

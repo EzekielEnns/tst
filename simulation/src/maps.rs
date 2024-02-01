@@ -30,7 +30,7 @@ pub fn first_test_world(dim: &Pos,actors: &mut [Option<Actor>],items:&mut [Optio
         },
     };
     //itterate through array see if index is in spot
-    for i in 0..tiles.len() {
+    for i in 0..(dim.y*dim.x) {
         //check if on dimentions
         let pos = get_pos(*dim, i as usize);
         if pos.y == 0 || pos.y == dim.y {

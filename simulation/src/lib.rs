@@ -26,9 +26,18 @@ pub unsafe extern "C" fn move_pc(new: usize) {
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn get_buffs()-> *mut u8 {
+pub unsafe extern "C" fn alloc_buffers()-> *mut u8 {
     WORLD.render_alloc()
 }
+#[no_mangle]
+pub unsafe extern "C" fn get_buffs(ptr: *mut u8, size: usize)-> *mut u8 {
+    WORLD.render_update(ptr,size)
+}
+#[no_mangle]
+pub unsafe extern "C" fn get_buff_len()-> usize{
+    WORLD.render_len()
+}
+
 #[no_mangle]
 pub unsafe extern "C" fn update() {
     WORLD.render_actors();
@@ -36,3 +45,18 @@ pub unsafe extern "C" fn update() {
     WORLD.render_tiles();
 }
 
+#[cfg(test)]
+mod tests {
+    use crate::{update, WORLD};
+
+    #[test]
+    fn it_works() {
+        unsafe {
+            println!("hi");
+            update();
+            println!("ih");
+            println!("{}",WORLD.render_data.actors.len);
+            panic!()
+        }
+    }
+}

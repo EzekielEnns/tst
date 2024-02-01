@@ -11,6 +11,7 @@ pub trait Entity {
     fn get_mut(&mut self) -> &mut RenderValue;
 }
 
+#[derive(Clone)]
 pub struct Actor { 
     pub render_value: RenderValue,
     pub items: Vec<Item>,

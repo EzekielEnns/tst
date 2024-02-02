@@ -31,10 +31,10 @@ pub fn first_test_world(w: &mut World){
     };
     for i in 0..(w.dim.x * w.dim.y) {
         let pos = get_pos(w.dim, i as usize);
-        if pos.y == 0 || pos.y == w.dim.y {
+        if pos.y == 0 || pos.y == w.dim.y-1 {
             w.tiles.push(top);
         }
-        else if pos.x == 0 || pos.x == w.dim.x {
+        else if pos.x == 0 || pos.x == w.dim.x-1 {
             w.tiles.push(side);
         }
         else {

@@ -39,13 +39,31 @@ addLayer({params:{
     end:{x:1,y:-1},
     noFill: false
 }})
+//things layer
+addLayer({params:{
+    columns:10,
+    rows:10,
+    start:{x:-1,y:1},
+    end:{x:1,y:-1},
+    noFill: false
+}})
 var pull_data = true;
 function renderLoop() {
     if (pull_data) {
         let rd = getRenderData();
+        console.log(rd)
         let map = getLayer(0);
+        let ply = getLayer(1);
         for (let i = 0; i < rd.tiles.len; i++){
-            map.setQuadTex(i,String.fromCharCode(rd.tiles.textures[0]))
+            map.setQuadTex(i,String.fromCharCode(rd.tiles.textures[i]))
+        }
+        for (let i =0; i<rd.actors.len; i++){
+           ply.setQuadTex(rd.actors.locations[i],
+               String.fromCharCode(rd.actors.textures[i])) 
+        }
+        for (let i =0; i<rd.items.len; i++){
+           ply.setQuadTex(rd.items.locations[i],
+               String.fromCharCode(rd.items.textures[i])) 
         }
         pull_data = false;
     }

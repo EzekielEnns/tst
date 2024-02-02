@@ -14,7 +14,7 @@
   "license": "ISC",
   "dependencies": {
     "bencode": "^4.0.0",
-    "glyplib": "^0.0.3"
+    "glyplib": "^0.0.4"
   },
   "devDependencies": {
     "webpack": "^5.90.0",

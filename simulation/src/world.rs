@@ -1,5 +1,5 @@
 
-use crate::{entities::{Item, Actor, Tile, Entity}, render::{RenderData, RenderValue}, maps::Generate};
+use crate::{entities::{Item, Actor, Tile, Entity}, render::{RenderData, RenderValue, RenderBuffers}, maps::Generate};
 //TODO add animated entity
 #[derive(Clone, Copy)]
 pub struct Pos {pub x:usize, pub y:usize}
@@ -34,6 +34,7 @@ pub struct World{
     pub dim: Pos,
     //pub render_data: RenderData,
     pub player_index: usize,
+    pub render_len: usize,
     //TODO add combat states i.e. enemy team and player team
 }
 
@@ -49,7 +50,8 @@ impl World{
             items: Vec::<Item>::with_capacity(len),
             item_locations: Vec::<usize>::with_capacity(len),
             tiles: Vec::<Tile>::with_capacity(len),
-            player_index: 0 //TODO auto update?
+            player_index: 0, //TODO auto update?
+            render_len: 0
         }
     }
     fn len(&self)->usize{self.dim.x*self.dim.y}
@@ -69,109 +71,53 @@ impl World{
 
         }
         else if let Some(collision) = self.item_locations.iter().position(|&v| v==new) {
-            let mut actor = self.actors[index];
+            let actor = &mut self.actors[index];
             actor.items.push(self.items.remove(collision));
         }
         return true;
     }
 
-    //TODO move to trait for sanity
-    //lets js read the render_data struct from the world
-    // pub unsafe fn render_alloc(&self)-> *mut u8 {
-    //     let mut buf = bendy::serde::to_bytes(&self.render_data).unwrap();
-    //     let ptr = buf.as_mut_ptr();
-    //     std::mem::forget(buf);
-    //     return ptr;
-    // }
-    // pub unsafe fn render_update(&self,ptr: *mut u8,size: usize)-> *mut u8 {
-    //     //clean up
-    //     let data = Vec::from_raw_parts(ptr,size,size);
-    //     std::mem::drop(data);
-    //     
-    //     self.render_alloc()
-    // }
-    // pub unsafe fn render_len(&self) -> usize {
-    //     bendy::serde::to_bytes(&self.render_data).unwrap().len()
-    // }
-    //
-    //
-    // //updates the render values inside the render_data
-    // unsafe fn render(&mut self, v:RenderType){
-    //     let mut value = match v {
-    //         RenderType::ACTORS => {self.render_data.actors.get_textures()}
-    //         RenderType::TILES => {self.render_data.map.get_textures()}
-    //         RenderType::ITEMS => {self.render_data.items.get_textures()}
-    //     };
-    //     value.clear();
-    //     let mut color = match v {
-    //         RenderType::ACTORS => {self.render_data.actors.get_colors()}
-    //         RenderType::TILES => {self.render_data.map.get_colors()}
-    //         RenderType::ITEMS => {self.render_data.items.get_colors()}
-    //     };
-    //     color.clear();
-    //     let mut positions = match v {
-    //         RenderType::ACTORS => {self.render_data.actors.get_locations()}
-    //         RenderType::TILES => {self.render_data.map.get_locations()}
-    //         RenderType::ITEMS => {self.render_data.items.get_locations()}
-    //     };
-    //     positions.clear();
-    //     
-    //     //update the values later based on actor glyphs
-    //     for i in 0..self.len() {
-    //         match v {
-    //             RenderType::ACTORS => {
-    //                 if let Some(actor) = &self.actors[i] {
-    //                     positions.push(i as u8);
-    //                     color.push(actor.render_value.text);
-    //                     value.push(actor.render_value.color);
-    //                 }
-    //             }
-    //             RenderType::ITEMS => {
-    //                 if let Some(item) = &self.items[i] {
-    //                     positions.push(i as u8);
-    //                     color.push(item.render_value.text);
-    //                     value.push(item.render_value.color);
-    //                 }
-    //             }
-    //             RenderType::TILES => {
-    //                 //TODO needs culling
-    //                 let tile = &self.tiles[i];
-    //                 positions.push(i as u8);
-    //                 color.push(tile.render_value.text);
-    //                 value.push(tile.render_value.color);
-    //             }
-    //         };
-    //
-    //     }
-    //     match v {
-    //         RenderType::ITEMS => {
-    //             self.render_data.items.len = value.len(); 
-    //         }
-    //         RenderType::ACTORS => {
-    //             self.render_data.actors.len = value.len();
-    //         }
-    //         RenderType::TILES => {}
-    //     } 
-    //     println!("{}",value.len());
-    // }
-    // pub unsafe fn render_actors(&mut self){
-    //     self.render(RenderType::ACTORS);
-    // }
-    // pub unsafe fn render_items(&mut self){
-    //     self.render(RenderType::ITEMS);
-    // }
-    // pub unsafe fn render_tiles(&mut self){
-    //     self.render(RenderType::TILES);
-    // }
-    // pub unsafe fn render_all(&mut self){
-    //     self.render_actors();
-    //     self.render_tiles();
-    //     self.render_items();
-    // }
+    pub unsafe fn pack_buffer(&mut self,old: *mut u8,size: usize) -> *mut u8 {
+        if old != std::ptr::null_mut() && size != 0 {
+            std::mem::drop(Vec::from_raw_parts(old,size,size));
+        }
+        let mut items = RenderBuffers::new();
+        items.len = self.items.len();
+        for (i,elm) in self.items.iter().enumerate() {
+            let render = elm.render_value;
+            items.colors.push(render.color);
+            items.textures.push(render.text);
+            items.locations.push(self.item_locations[i] as u8);
+        }
+        let mut tiles = RenderBuffers::new();
+        tiles.len = self.tiles.len();
+        for (i,elm) in self.tiles.iter().enumerate() {
+            let render = elm.render_value;
+            tiles.colors.push(render.color);
+            tiles.textures.push(render.text);
+            tiles.locations.push(i as u8);
+        }
+        let mut actors = RenderBuffers::new();
+        actors.len = self.actors.len();
+        for (i,elm) in self.actors.iter().enumerate() {
+            let render = elm.render_value;
+            actors.colors.push(render.color);
+            actors.textures.push(render.text);
+            actors.locations.push(self.actor_locations[i] as u8);
+        }
+
+        let data = RenderData { actors,items, tiles };
+        let mut buf = bendy::serde::to_bytes(&data).unwrap();
+        self.render_len = buf.len();
+        let ptr = buf.as_mut_ptr();
+        std::mem::forget(buf);
+        return ptr;
+    }
+
 }
 
 impl Generate for World {
-    fn generate(&mut self,func: fn(dim: &Pos, actors: &mut [Option<Actor>],items:&mut [Option<Item>],tiles:&mut [Tile])) {
-        func(&self.dim,&mut self.actors,&mut self.items,&mut self.tiles);
+    fn generate(&mut self,func: fn(&mut World)) {
+        func(self);
     }
 }

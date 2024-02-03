@@ -46,7 +46,7 @@ addLayer({params:{
     start:{x:-1,y:1},
     end:{x:1,y:-1},
     noFill: true
-}},2)
+}},2) //TODO add a way to add quads and remove quads
 var pull_data = true;
 
 function renderLoop() {
@@ -55,7 +55,6 @@ function renderLoop() {
         console.log(rd)
         let map = getLayer(0);
         let ply = getLayer(1);
-        console.log(ply)
         for (let i = 0; i < rd.tiles.len; i++){
             map.setQuadTex(i,String.fromCharCode(rd.tiles.textures[i]))
         }
@@ -71,6 +70,8 @@ function renderLoop() {
            ply.setQuadTex(j,
                String.fromCharCode(rd.items.textures[i])) 
         }
+        //TODO clear old items some how
+        if (rd.items.len == 0) { alert("you picked up a coin") }
         pull_data = false;
     }
     render()

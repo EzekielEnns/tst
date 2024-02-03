@@ -71,6 +71,7 @@ impl World{
         else if let Some(collision) = self.item_locations.iter().position(|&v| v==new) {
             let actor = &mut self.actors[index];
             actor.items.push(self.items.remove(collision));
+            self.item_locations.remove(collision);
         }
         self.actor_locations[index] = new;
         return true;

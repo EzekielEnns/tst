@@ -45,24 +45,30 @@ addLayer({params:{
     rows:10,
     start:{x:-1,y:1},
     end:{x:1,y:-1},
-    noFill: false
-}})
+    noFill: true
+}},2)
 var pull_data = true;
+
 function renderLoop() {
     if (pull_data) {
         let rd = getRenderData();
         console.log(rd)
         let map = getLayer(0);
         let ply = getLayer(1);
+        console.log(ply)
         for (let i = 0; i < rd.tiles.len; i++){
             map.setQuadTex(i,String.fromCharCode(rd.tiles.textures[i]))
         }
         for (let i =0; i<rd.actors.len; i++){
-           ply.setQuadTex(rd.actors.locations[i],
+           ply.setQuad(i,ply.getCell(rd.actors.locations[i]));
+           ply.setQuadTex(i,
                String.fromCharCode(rd.actors.textures[i])) 
         }
-        for (let i =0; i<rd.items.len; i++){
-           ply.setQuadTex(rd.items.locations[i],
+        let offset = rd.actors.len;
+        for (let j =offset; j<rd.items.len+offset; j++){
+           let i = j-offset
+           ply.setQuad(j,ply.getCell(rd.items.locations[i]));
+           ply.setQuadTex(j,
                String.fromCharCode(rd.items.textures[i])) 
         }
         pull_data = false;
@@ -70,6 +76,30 @@ function renderLoop() {
     render()
     requestAnimationFrame(renderLoop)
 }
+
+window.addEventListener("keydown",(e)=>{
+    switch (e.key) {
+        case "w":
+            console.log(sim.move_pc('u'.charCodeAt()))
+            pull_data = true;
+            break;
+        case "a":
+            sim.move_pc('l'.charCodeAt())
+            pull_data = true;
+            break;
+        case "s":
+            sim.move_pc('d'.charCodeAt())
+            pull_data = true;
+            break;
+        case "d":
+            sim.move_pc('r'.charCodeAt())
+            pull_data = true;
+            break;
+    }
+})
+
+
+
 //https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame
 requestAnimationFrame(renderLoop)
 

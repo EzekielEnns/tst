@@ -11,7 +11,7 @@ and i will have to overcome this some how
 
 use maps::{Generate, first_test_world};
 use once_cell::sync::Lazy;
-use world::{World, move_player, get_index, Pos};
+use world::{World, move_player, get_index, Pos, get_pos};
 mod utils;
 mod skills; 
 mod world;
@@ -27,9 +27,20 @@ static mut WORLD: Lazy<World> = Lazy::new(|| {
 });
 
 #[no_mangle]
-pub unsafe extern "C" fn move_pc(x:usize, y:usize ) {
-    let new = get_index(&WORLD.dim,&Pos {x,y});
-    move_player(&mut WORLD,new);
+pub unsafe extern "C" fn move_pc(d:u8) -> bool {
+    //TODO calculate new postion, based on shift with d
+    //add pos to current player pos 
+    //get index and send it to move command
+    let mut ply = get_pos(WORLD.dim,WORLD.actor_locations[WORLD.player_index]);
+    match d {
+        b'u' => { if ply.y != 0 { ply.y -= 1; } }
+        b'd' => { if ply.y != WORLD.dim.y { ply.y += 1; } }
+        b'l' => { if ply.x != 0 { ply.x -= 1; } }
+        b'r' => { if ply.x != WORLD.dim.x { ply.x += 1; } }
+        _ => {}
+    };
+    let new = get_index(&WORLD.dim,&ply);
+    move_player(&mut WORLD,new)
 }
 
 #[no_mangle]
@@ -43,11 +54,14 @@ pub unsafe extern "C" fn get_len()-> usize {
 
 #[cfg(test)]
 mod tests {
+    use crate::move_pc;
+
 
     #[test]
     fn it_works() {
-            println!("hi");
-            println!("ih");
+            unsafe {
+                move_pc(b'u');
+            }
             panic!()
     }
 }

@@ -23,7 +23,7 @@ pub fn first_test_world(w: &mut World){
         },
     };
     let floor = Tile {
-        collision: true,
+        collision: false,
         render_value: RenderValue {
             text: b'.',
             color: 255/2,

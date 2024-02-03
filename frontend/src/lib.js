@@ -318,8 +318,8 @@ class Layer {
      * @type {c:number,r:number}
      */
     let i = typeof index == "number" ? {
-      c: i % this.#columns,
-      r: (index - (i % this.#columns)) / this.#columns
+      c: index % this.#columns,
+      r: (index - (index % this.#columns)) / this.#columns
     } : index
     let top = this.#start.y - i.r * this.#CellHeight
     let bottom = top - this.#CellHeight

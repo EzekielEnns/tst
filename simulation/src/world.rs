@@ -14,10 +14,8 @@ pub fn get_pos(b:Pos,i:usize)->Pos{
 //gets the index based on a postion 
 pub fn get_index(b:&Pos,p:&Pos)->usize { p.y * b.y + p.x }
 
-pub fn move_player(wld: &mut World,new: usize){
-    if wld.move_actor(wld.player_index,new) {
-        wld.player_index = new;
-    }
+pub fn move_player(wld: &mut World,new: usize)->bool{
+    wld.move_actor(wld.player_index,new)
 }
 
 /*
@@ -74,6 +72,7 @@ impl World{
             let actor = &mut self.actors[index];
             actor.items.push(self.items.remove(collision));
         }
+        self.actor_locations[index] = new;
         return true;
     }
 

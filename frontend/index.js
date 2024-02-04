@@ -1,4 +1,4 @@
-import * as sim from "./dist/wasm32-unknown-unknown/debug/simulation.wasm"
+import * as sim from "./builds/wasm32-unknown-unknown/debug/simulation.wasm"
 import bencode from 'bencode'
 import {getLayer, init, render} from "./src/lib.js"
 import { addLayer } from "./src/lib.js";

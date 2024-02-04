@@ -210,6 +210,7 @@ class Layer {
    */
   #length = 0;
 
+
   /**
    * this enum is for navigating values inside the buffers array
    * this enables lib users to either add or modify how 
@@ -382,6 +383,12 @@ class Layer {
     }
   }
 
+  /**
+   * @returns {number}
+   */
+   getLen() {
+       return this.#length
+   }
   /**
    * @param {Index} index 
    * @returns {number}

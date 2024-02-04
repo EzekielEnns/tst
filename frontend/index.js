@@ -65,13 +65,17 @@ function renderLoop() {
         }
         let offset = rd.actors.len;
         for (let j =offset; j<rd.items.len+offset; j++){
+            console.log("items")
            let i = j-offset
            ply.setQuad(j,ply.getCell(rd.items.locations[i]));
            ply.setQuadTex(j,
                String.fromCharCode(rd.items.textures[i])) 
         }
-        //TODO clear old items some how
-        if (rd.items.len == 0) { alert("you picked up a coin") }
+        //clearing unused cells
+        for (let i = offset+rd.items.len; i< ply.getLen(); i++) {
+            //FIXME/TODO grow and shrink a layer
+            ply.setQuadTex(i,' ');
+        }
         pull_data = false;
     }
     render()
@@ -103,11 +107,3 @@ window.addEventListener("keydown",(e)=>{
 
 //https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame
 requestAnimationFrame(renderLoop)
-
-//TODO bind movment  
-
-//TODO make render loop like in testing for glyph lib
-//getRenderData
-//in loop approche render data based on factor
-//repeat
-

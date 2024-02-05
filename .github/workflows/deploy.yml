@@ -30,10 +30,15 @@ jobs:
         #TODO add a cache
         run: pnpm build
         working-directory: ./frontend
-      - run: tar -czvf site.tar.gz -C ./frontend/dist/ .
-      - run: mkdir _site && mv site.tar.gz _site/
-      - name: archive prod articfacts
+      # - run: tar -czvf site.tar.gz -C ./frontend/dist/ .
+      # - run: mkdir _site && mv site.tar.gz _site/
+      - name: Setup Pages
+        uses: actions/configure-pages@v3
+      - name: Upload artifact
+        #https://vitejs.dev/guide/static-deploy
         uses: actions/upload-pages-artifact@v2
+        with:
+          path: './frontend/dist'
 
   deploy:
     needs: build

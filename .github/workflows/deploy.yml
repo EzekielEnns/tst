@@ -13,12 +13,13 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout your repository using git
-        uses: actions/checkout@v3
-      - name: build wasm
-        working-directory: ./simulation
-        run: cargo b
+      # - name: Checkout your repository using git
+      #   uses: actions/checkout@v3
+      # - name: build wasm
+      #   working-directory: ./simulation
+      #   run: cargo b
       - uses: pnpm/action-setup@v2
+        working-directory: ./frontend
       - name: install deps frontend
         working-directory: ./frontend
         run: pnpm i

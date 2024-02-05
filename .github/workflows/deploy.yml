@@ -23,7 +23,7 @@ jobs:
           command: b
       - name: build frontend
         working-directory: ./frontend
-        uses: jjs98/pnpm-install-action@v6
+        run: pnpm i
         run: pnpm build
 
   deploy:

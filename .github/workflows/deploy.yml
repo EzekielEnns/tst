@@ -20,7 +20,7 @@ jobs:
       #   run: cargo b
       - uses: pnpm/action-setup@v2
         with:
-          package_json_file: ./frontend/package.json
+          package_json_file: ../../frontend/package.json
           # run_install: false
       - name: install deps frontend
         working-directory: ./frontend

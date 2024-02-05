@@ -25,7 +25,7 @@ jobs:
           #package_json_file: ./frontend/package.json
           # run_install: false
       - name: install deps frontend
-        working-directory: frontend
+        working-directory: .././frontend
         run: pnpm i
       - name: build frontend
         run: pnpm build

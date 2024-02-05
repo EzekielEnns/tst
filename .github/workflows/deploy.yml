@@ -13,19 +13,17 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      # - name: Checkout your repository using git
-      #   uses: actions/checkout@v3
-      # - name: build wasm
-      #   working-directory: ./simulation
-      #   run: cargo b
+      - name: Checkout your repository using git
+        uses: actions/checkout@v3
+      - name: build wasm
+        working-directory: ./simulation
+        run: cargo b
       - uses: pnpm/action-setup@v2
         with:
           version: 8
           run_install: false
-          #package_json_file: ./frontend/package.json
-          # run_install: false
       - name: install deps frontend
-        working-directory: .././frontend
+        working-directory: ./frontend
         run: pnpm i
       - name: build frontend
         run: pnpm build

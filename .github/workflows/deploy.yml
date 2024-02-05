@@ -28,6 +28,11 @@ jobs:
       - name: build frontend
         run: pnpm build
         working-directory: ./frontend
+      - name: archive prod articfacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: ./frontend/dist
 
   deploy:
     needs: build

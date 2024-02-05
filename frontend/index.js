@@ -2,6 +2,7 @@ import * as sim from "./builds/wasm32-unknown-unknown/debug/simulation.wasm"
 import bencode from 'bencode'
 import {getLayer, init, render} from "./src/lib.js"
 import { addLayer } from "./src/lib.js";
+import font from "/monogram.ttf"
 
 var/** @type {number} */ ptr = sim.get_buffs(),
    /** @type {number} */ len = sim.get_len(),
@@ -30,7 +31,7 @@ function getRenderData(){
     return bencode.decode(buff)
 }
 
-await init(cnv,"/monogram.ttf")
+await init(cnv,font)
 //map layer
 addLayer({params:{
     columns:10,

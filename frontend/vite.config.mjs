@@ -7,7 +7,7 @@ export default defineConfig({
       wasm(),
       topLevelAwait()
   ],
-  base:"tst/",
+  base:"/tst",
   build: {
       target:"esnext",
     // Relative to the root

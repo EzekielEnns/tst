@@ -7,6 +7,7 @@ export default defineConfig({
       wasm(),
       topLevelAwait()
   ],
+  base:"https://ezekielenns.github.io/tst/",
   build: {
       target:"esnext",
     // Relative to the root

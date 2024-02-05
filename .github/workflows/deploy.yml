@@ -28,10 +28,11 @@ jobs:
       - name: build frontend
         run: pnpm build
         working-directory: ./frontend
+      - run: tar -czvf site.tar.gz -C ./frontend/dist/ .
       - name: archive prod articfacts
         uses: actions/upload-pages-artifact@v2
         with:
-          path: ./frontend/dist
+          path: ./site.tar.gz
 
   deploy:
     needs: build

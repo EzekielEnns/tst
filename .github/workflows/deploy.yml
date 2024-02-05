@@ -19,7 +19,8 @@ jobs:
       #   working-directory: ./simulation
       #   run: cargo b
       - uses: pnpm/action-setup@v2
-        working-directory: ./frontend
+        with:
+          run_install: false
       - name: install deps frontend
         working-directory: ./frontend
         run: pnpm i

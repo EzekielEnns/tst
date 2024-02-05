@@ -21,7 +21,7 @@ jobs:
       - name: build frontend
         working-directory: ./frontend
         run: pnpm i
-        run: pnpm build
+      - run: pnpm build
 
   deploy:
     needs: build

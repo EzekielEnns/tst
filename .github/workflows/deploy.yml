@@ -18,10 +18,13 @@ jobs:
       - name: build wasm
         working-directory: ./simulation
         run: cargo b
-      - name: build frontend
+      - uses: pnpm/action-setup@v2
+      - name: install deps frontend
         working-directory: ./frontend
         run: pnpm i
-      - run: pnpm build
+      - name: build frontend
+        run: pnpm build
+        working-directory: ./frontend
 
   deploy:
     needs: build

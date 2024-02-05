@@ -17,6 +17,7 @@ jobs:
         uses: actions/checkout@v3
       - name: build wasm
         working-directory: ./simulation
+        #TODO add a cache
         run: cargo b
       - uses: pnpm/action-setup@v2
         with:
@@ -26,13 +27,13 @@ jobs:
         working-directory: ./frontend
         run: pnpm i
       - name: build frontend
+        #TODO add a cache
         run: pnpm build
         working-directory: ./frontend
       - run: tar -czvf site.tar.gz -C ./frontend/dist/ .
+      - run: mkdir _site && mv site.tar.gz _site/
       - name: archive prod articfacts
         uses: actions/upload-pages-artifact@v2
-        with:
-          path: ./site.tar.gz
 
   deploy:
     needs: build

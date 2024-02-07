@@ -9,6 +9,16 @@ pub struct Stats {
     //FIXME add speed/enum
 }
 
+impl Stats {
+    fn regulate(&mut self, nrm:Stats) {
+        //this function approches the values 
+        //adding to stamina, decrementing status
+        //hp is ignored (allows for overflow of hp)
+        //i.e. hp is unregulated
+        todo!()
+    }
+}
+
 impl ops::AddAssign for Stats {
     fn add_assign(&mut self, rhs: Self) {
         self.hp += rhs.hp;

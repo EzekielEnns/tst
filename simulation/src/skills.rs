@@ -9,11 +9,33 @@ pub struct Skill {
     pub deffense: bool,
     pub name: &'static str,
     pub range: i32,
-    //TODO add projectile
 }
 
 
 struct Combo {
     pub combo:Vec<&'static Skill>,
     pub index: usize
+}
+
+struct Team {
+    pub stats: Stats,
+    pub max: Stats,
+
+    pub damage: Vec<&'static Skill>,
+    pub deffense: Vec<&'static Skill>,
+}
+
+impl Team {
+    fn apply_dmg(&mut self)-> Stats {
+        //deques deffense buffer
+        todo!()
+    }
+    fn get_dmg(&mut self)-> Stats {
+        //deques damage buffer
+        todo!()
+    }
+
+    fn rest(&mut self) {
+        todo!()
+    }
 }

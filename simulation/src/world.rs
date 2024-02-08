@@ -1,5 +1,5 @@
 
-use crate::{entities::{Item, Actor, Tile, Entity}, render::{RenderData, RenderValue, RenderBuffers}, maps::Generate};
+use crate::{entities::{Item, Actor, Tile, Entity}, render::{RenderData, RenderValue, RenderBuffers}, maps::Generate, skills::Team};
 //TODO add animated entity
 #[derive(Clone, Copy)]
 pub struct Pos {pub x:usize, pub y:usize}
@@ -33,6 +33,7 @@ pub struct World{
     //pub render_data: RenderData,
     pub player_index: usize,
     pub render_len: usize,
+    pub teams: Vec<Team>
     //TODO add combat states i.e. enemy team and player team
 }
 
@@ -49,7 +50,8 @@ impl World{
             item_locations: Vec::<usize>::with_capacity(len),
             tiles: Vec::<Tile>::with_capacity(len),
             player_index: 0, //TODO auto update?
-            render_len: 0
+            render_len: 0,
+            teams:Vec::<Team>::with_capacity(2)
         }
     }
     fn len(&self)->usize{self.dim.x*self.dim.y}

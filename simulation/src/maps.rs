@@ -60,7 +60,7 @@ pub fn first_test_world(w: &mut World){
             color: 25,
         },
         name: "coin",
-        modifyer: Stats::default(),
+        modifyer: Stats::default().to_owned(),
         consumable: false,
     };
     center.y +=1;

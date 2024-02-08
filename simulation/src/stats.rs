@@ -1,7 +1,7 @@
 use std::{ops, f32};
 use serde::{Deserialize, Serialize};
 
-#[derive(Default, Serialize, Deserialize, Clone, Copy)]
+#[derive(Default, Clone,PartialEq,Copy)]
 pub struct Stats {
     pub hp: f32,
     pub sp: f32,
@@ -16,6 +16,42 @@ impl Stats {
         //hp is ignored (allows for overflow of hp)
         //i.e. hp is unregulated
         todo!()
+    }
+}
+
+impl ops::Add<Stats> for Stats {
+    type Output = Stats;
+    fn add(self, rhs: Stats) -> Self::Output {
+        Stats {
+            hp:self.hp + rhs.hp,
+            sp:self.sp + rhs.sp,
+            status: {
+                        let mut result = [0; 1]; 
+                        for (result_status, (&self_status, &rhs_status)) in result
+                                 .iter_mut().zip(self.status.iter().zip(rhs.status.iter())) {
+                             *result_status = self_status + rhs_status;
+                        }
+                        result
+                }
+        }
+    }
+}
+impl ops::Sub<Stats> for Stats {
+    type Output = Stats;
+    fn sub(self, rhs: Stats) -> Self::Output {
+        Stats {
+            hp:self.hp - rhs.hp,
+            sp:self.sp - rhs.sp,
+            status: {
+                //TODO move to a function
+                        let mut result = [0; 1]; 
+                        for (result_status, (&self_status, &rhs_status)) in result
+                                 .iter_mut().zip(self.status.iter().zip(rhs.status.iter())) {
+                             *result_status = self_status + rhs_status;
+                        }
+                        result
+                }
+        }
     }
 }
 

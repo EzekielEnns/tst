@@ -1,4 +1,4 @@
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize, Serialize, ser::SerializeStruct};
 use crate::{stats::Stats, world::World};
 
 #[derive(PartialEq)]
@@ -8,7 +8,19 @@ pub struct Skill {
     pub modifer: bool,
     pub deffense: bool,
     pub name: &'static str,
+    //TODO add description
     pub range: i32,
+}
+
+impl Serialize for Skill {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer {
+            let mut state = serializer.serialize_struct("Skill",2)?;
+            state.serialize_field("cost",&self.cost)?;
+            state.serialize_field("name",self.name)?;
+            state.end()
+        }
 }
 /* TODO add for skills
 impl Serialize for Buffer {

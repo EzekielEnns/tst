@@ -1,7 +1,7 @@
 use std::{ops, f32};
 use serde::{Deserialize, Serialize};
 
-#[derive(Default, Clone,PartialEq,Copy)]
+#[derive(Serialize,Default, Clone,PartialEq,Copy)]
 pub struct Stats {
     pub hp: f32,
     pub sp: f32,

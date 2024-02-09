@@ -10,6 +10,17 @@ pub struct Skill {
     pub name: &'static str,
     pub range: i32,
 }
+/* TODO add for skills
+impl Serialize for Buffer {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer {
+            let mut state = serializer.serialize_struct("Buffer",2)?;
+            state.serialize_field("ptr", &format!("{:p}",self.ptr))?;
+            state.end()
+        }
+}
+*/
 
 
 pub struct Combo {

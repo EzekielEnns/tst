@@ -11,6 +11,7 @@ and i will have to overcome this some how
 
 use maps::{Generate, first_test_world};
 use once_cell::sync::Lazy;
+use skills::Skill;
 use world::{World, move_player, get_index, Pos, get_pos};
 mod utils;
 mod skills; 
@@ -25,6 +26,10 @@ static mut WORLD: Lazy<World> = Lazy::new(|| {
     wl.generate(first_test_world);
     wl
 });
+
+static SKILLS: [Skill;1] = [
+    Skill::default()
+];
 
 #[no_mangle]
 pub unsafe extern "C" fn move_pc(d:u8) -> bool {

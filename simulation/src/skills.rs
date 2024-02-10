@@ -5,13 +5,23 @@ use crate::{stats::Stats, world::World};
 pub struct Skill {
     pub cost: Stats,
     pub effect: Stats,
-    pub modifer: bool,
+    // pub modifer: bool,
     pub deffense: bool,
     pub name: &'static str,
     //TODO add description
-    pub range: i32,
+    pub reach: usize,
 }
-
+impl Default for Skill {
+    fn default() -> Self {
+        Skill {
+            name:"DUMMY SKILL",
+            cost: Stats::default(),
+            effect: Stats::default(),
+            deffense: false,
+            reach: 0,
+        }
+    }
+}
 impl Serialize for Skill {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
@@ -22,17 +32,6 @@ impl Serialize for Skill {
             state.end()
         }
 }
-/* TODO add for skills
-impl Serialize for Buffer {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer {
-            let mut state = serializer.serialize_struct("Buffer",2)?;
-            state.serialize_field("ptr", &format!("{:p}",self.ptr))?;
-            state.end()
-        }
-}
-*/
 
 
 pub struct Combo {

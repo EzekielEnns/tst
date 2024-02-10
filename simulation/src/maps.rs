@@ -1,5 +1,5 @@
 //TODO this file is for generating content to store in world
-use crate::{entities::{Tile, Item, Actor}, render::RenderValue, stats::Stats, world::{Pos, get_pos, get_index, World}};
+use crate::{entities::{Tile, Item, Actor}, render::RenderValue, stats::Stats, world::{Pos, get_pos, get_index, World}, skills::Combo, SKILLS};
 
 
 pub trait Generate {
@@ -42,6 +42,11 @@ pub fn first_test_world(w: &mut World){
         }
     }
     let player = Actor {
+        combos:vec![Combo {
+            index:0,
+            combo:vec![Some(&SKILLS[0]);1]
+        }],
+        skills:vec![&SKILLS[0]],
         render_value: RenderValue {
             color: 80,
             text: b'@',

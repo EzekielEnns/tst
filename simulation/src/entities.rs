@@ -1,4 +1,6 @@
+use crate::SKILLS;
 use crate::render::RenderValue;
+use crate::skills::{Skill, Combo};
 use crate::stats::Stats;
 
 
@@ -11,11 +13,28 @@ pub trait Entity {
     fn get_mut(&mut self) -> &mut RenderValue;
 }
 
-#[derive(Clone)]
 pub struct Actor { 
     pub render_value: RenderValue,
     pub items: Vec<Item>,
     pub is_hostile: bool,
+    pub skills: Vec<&'static Skill>, // first 4 are the skills equipted
+    pub combos: Vec<Combo>,
+}
+
+impl Actor {
+    pub fn render_active_skills(&self)-> (*mut u8,usize){
+        let mut skills:[Option<&Skill>;4] = [None;4];
+        for i in 0..if self.combos.len() < 4 {self.combos.len()} else {4}{
+            let cb =  &self.combos[i];
+            skills[i] = cb.combo[cb.index];
+        } 
+        let mut buf = bendy::serde::to_bytes(&skills).unwrap();
+        //TODO deal with len
+        let ptr = buf.as_mut_ptr();
+        let len = buf.len();
+        std::mem::forget(buf);
+        (ptr,len)
+    }
 }
 impl Entity for Actor{
     fn render(&self) -> RenderValue { self.render_value }

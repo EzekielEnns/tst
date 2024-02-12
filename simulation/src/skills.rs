@@ -1,4 +1,4 @@
-use serde::{Deserialize, Serialize, ser::SerializeStruct};
+use serde::{ Serialize, ser::SerializeStruct};
 use crate::{stats::Stats, world::World};
 
 #[derive(PartialEq)]

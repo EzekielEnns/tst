@@ -1,4 +1,3 @@
-use crate::SKILLS;
 use crate::render::RenderValue;
 use crate::skills::{Skill, Combo};
 use crate::stats::Stats;
@@ -41,7 +40,6 @@ impl Entity for Actor{
     fn get_mut(&mut self) -> &mut RenderValue {&mut self.render_value}
     
 }
-impl Actor { }
 
 #[derive(Clone, Copy)]
 pub struct Tile { pub render_value:RenderValue, pub collision:bool }

@@ -12,6 +12,7 @@ and i will have to overcome this some how
 use maps::{Generate, first_test_world};
 use once_cell::sync::Lazy;
 use skills::Skill;
+use stats::Stats;
 use world::{World, move_player, get_index, Pos, get_pos};
 mod utils;
 mod skills; 
@@ -28,7 +29,13 @@ static mut WORLD: Lazy<World> = Lazy::new(|| {
 });
 
 static SKILLS: [Skill;1] = [
-    Skill::default()
+    Skill {
+        name:"DUMMY SKILL",
+        cost: Stats {hp:0.0,sp:0.0,status:[0;1]},
+        effect: Stats {hp:0.0,sp:0.0,status:[0;1]},
+        deffense: false,
+        reach: 0,
+    }
 ];
 
 #[no_mangle]
@@ -55,6 +62,16 @@ pub unsafe extern "C" fn get_buffs(ptr: *mut u8, size: usize)-> *mut u8 {
 #[no_mangle]
 pub unsafe extern "C" fn get_len()-> usize {
     WORLD.render_len
+}
+
+
+pub unsafe extern "C" fn turn() { }
+pub unsafe extern "C" fn end_turn() { }
+pub unsafe extern "C" fn render_player_skills() -> *mut u8{
+    todo!()
+}
+pub unsafe extern "C" fn get_player_skills_len() -> usize {
+    todo!()
 }
 
 #[cfg(test)]

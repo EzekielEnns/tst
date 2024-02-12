@@ -33,7 +33,8 @@ pub struct World{
     //pub render_data: RenderData,
     pub player_index: usize,
     pub render_len: usize,
-    pub teams: Vec<Team>
+    pub teams: Vec<Team>,
+    pub actor_render_len: usize,
     //TODO add combat states i.e. enemy team and player team
 }
 
@@ -51,7 +52,8 @@ impl World{
             tiles: Vec::<Tile>::with_capacity(len),
             player_index: 0, //TODO auto update?
             render_len: 0,
-            teams:Vec::<Team>::with_capacity(2)
+            teams:Vec::<Team>::with_capacity(2),
+            actor_render_len: 0,
         }
     }
     fn len(&self)->usize{self.dim.x*self.dim.y}

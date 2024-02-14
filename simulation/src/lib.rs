@@ -64,13 +64,26 @@ pub unsafe extern "C" fn get_len()-> usize {
     WORLD.render_len
 }
 
-
-pub unsafe extern "C" fn turn() { }
+//REMINDER, all external functions are player focused
+pub unsafe extern "C" fn turn(_index:usize) {
+    // TODO extract some of this out
+    // let player = &mut WORLD.actors[WORLD.player_index];
+    // let skill = player.skills[index];
+    // player.combos[index].index+=1; 
+}
 pub unsafe extern "C" fn end_turn() { }
-pub unsafe extern "C" fn render_player_skills() -> *mut u8{
+//renders players skills, all 4 of them
+pub unsafe extern "C" fn render_skills() -> *mut u8{
     todo!()
 }
-pub unsafe extern "C" fn get_player_skills_len() -> usize {
+pub unsafe extern "C" fn get_len_skills() -> usize {
+    todo!()
+}
+//renders team stats for player and enemey
+pub unsafe extern "C" fn render_stats() -> *mut u8{
+    todo!()
+}
+pub unsafe extern "C" fn get_len_stats() -> usize {
     todo!()
 }
 

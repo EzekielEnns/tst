@@ -70,7 +70,7 @@ impl Team {
         self.stats.status.iter_mut().for_each(|a| { if *a != 0 { *a -= 1 } });
     }
 
-    fn add_skill(&mut self, skill: &'static Skill){
+    pub fn add_skill(&mut self, skill: &'static Skill){
         if skill.deffense {
             self.deffense.push(skill);
         }
@@ -79,7 +79,7 @@ impl Team {
         }
         self.stats -= skill.cost;
     }
-    fn del_skill(&mut self, skill: &'static Skill){
+    pub fn del_skill(&mut self, skill: &'static Skill){
         if let Some(index) = self.deffense.iter().position(|&x| x == skill) {
             self.deffense.remove(index);
         }
@@ -94,7 +94,7 @@ impl Team {
 }
 
 impl World {
-    fn add_skill(){
+    pub fn add_skill(){
         //increments combos on entity
         //applys movment cost 
         //adds skill to team

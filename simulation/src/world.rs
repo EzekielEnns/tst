@@ -15,7 +15,8 @@ pub fn get_pos(b:Pos,i:usize)->Pos{
 pub fn get_index(b:&Pos,p:&Pos)->usize { p.y * b.y + p.x }
 
 pub fn move_player(wld: &mut World,new: usize)->bool{
-    wld.move_actor(wld.player_index,new)
+    //TODO impl https://doc.rust-lang.org/std/ops/trait.Index.html
+    wld.move_actor(IdxActor::PLAYER as usize,new)
 }
 
 /*
@@ -30,12 +31,24 @@ pub struct World{
     pub item_locations: Vec<usize>,
     pub tiles: Vec<Tile>,   
     pub dim: Pos,
-    //pub render_data: RenderData,
-    pub player_index: usize,
-    pub render_len: usize,
     pub teams: Vec<Team>,
-    pub actor_render_len: usize,
-    //TODO add combat states i.e. enemy team and player team
+    pub buff_lens: [usize;3]
+}
+
+#[repr(usize)]
+pub enum IdxBfLen {
+   RENDER=0,
+   STATSPLY,
+   SKILLS
+}
+#[repr(usize)]
+pub enum IdxActor {
+    PLAYER=0
+}
+#[repr(usize)]
+pub enum IdxTeam {
+    PLAYER=0,
+    HOSTILE,
 }
 
 enum RenderType{ ACTORS=0,ITEMS,TILES}
@@ -50,10 +63,9 @@ impl World{
             items: Vec::<Item>::with_capacity(len),
             item_locations: Vec::<usize>::with_capacity(len),
             tiles: Vec::<Tile>::with_capacity(len),
-            player_index: 0, //TODO auto update?
-            render_len: 0,
+            buff_lens: [0;3],
             teams:Vec::<Team>::with_capacity(2),
-            actor_render_len: 0,
+          //  actor_render_len: 0,
         }
     }
     fn len(&self)->usize{self.dim.x*self.dim.y}
@@ -112,10 +124,17 @@ impl World{
 
         let data = RenderData { actors,items, tiles };
         let mut buf = bendy::serde::to_bytes(&data).unwrap();
-        self.render_len = buf.len();
+        self.buff_lens[IdxBfLen::RENDER as usize]= buf.len();
         let ptr = buf.as_mut_ptr();
         std::mem::forget(buf);
         return ptr;
+    }
+
+    pub unsafe fn pack_skill_buff(&mut self,old: *mut u8,size: usize) -> *mut u8 {
+        if old != std::ptr::null_mut() && size != 0 {
+            std::mem::drop(Vec::from_raw_parts(old,size,size));
+        }
+        todo!()
     }
 
 }

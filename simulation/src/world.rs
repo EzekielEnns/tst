@@ -134,7 +134,9 @@ impl World{
         if old != std::ptr::null_mut() && size != 0 {
             std::mem::drop(Vec::from_raw_parts(old,size,size));
         }
-        todo!()
+        let (ptr,len) = self.actors[IdxActor::PLAYER as usize].render_active_skills();
+        self.buff_lens[IdxBfLen::SKILLS as usize] = len;
+        ptr
     }
 
 }

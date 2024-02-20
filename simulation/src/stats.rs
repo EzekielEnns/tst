@@ -1,5 +1,5 @@
 use std::{ops, f32};
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 
 #[derive(Serialize,Default, Clone,PartialEq,Copy)]
 pub struct Stats {

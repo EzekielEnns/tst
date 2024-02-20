@@ -31,7 +31,6 @@ impl Actor {
             skills[i] = cb.combo[cb.index];
         }
         let mut buf = bendy::serde::to_bytes(&skills).unwrap();
-        //TODO deal with len
         let ptr = buf.as_mut_ptr();
         let len = buf.len();
         std::mem::forget(buf);

@@ -6,12 +6,12 @@ import font from "/monogram.ttf"
 
 var/** @type {number} */ ptr = sim.get_buffs(),
    /** @type {number} */ len = sim.get_len(),
+   /** @type {number} */ skLen = sim.render_skills(),
+   /** @type {number} */ skPtr = sim.get_len_skills(),
    /** @type {HTMLCanvasElement} */ cnv = document.getElementById("canvas")
 /** @type {WebAssembly.Memory} */
 var memeory = sim.memory;
 
-console.log("hi")
-console.log(memeory.buffer)
 /**
  * @typedef {Object} RenderBuffers
  * @property {Uint8Array} textures
@@ -30,6 +30,17 @@ function getRenderData(){
     let buff = new Uint8Array(memeory.buffer,ptr,sim.get_len())
     return bencode.decode(buff)
 }
+/**
+ * @typedef {Object} Stat
+ * @typedef {Object} SkillData
+ */
+function getSkillData(){
+    skPtr = sim.render_skills(skPtr,skLen)
+    skLen = sim.get_len_skills()
+    let buff = new Uint8Array(memeory.buffer,skPtr,skLen)
+    return bencode.decode(buff)
+}
+console.log(JSON.stringify(getSkillData(),null, 2))
 
 await init(cnv,font)
 //map layer
@@ -53,7 +64,6 @@ var pull_data = true;
 function renderLoop() {
     if (pull_data) {
         let rd = getRenderData();
-        console.log(rd)
         let map = getLayer(0);
         let ply = getLayer(1);
         for (let i = 0; i < rd.tiles.len; i++){
@@ -66,7 +76,6 @@ function renderLoop() {
         }
         let offset = rd.actors.len;
         for (let j =offset; j<rd.items.len+offset; j++){
-            console.log("items")
            let i = j-offset
            ply.setQuad(j,ply.getCell(rd.items.locations[i]));
            ply.setQuadTex(j,
@@ -83,10 +92,11 @@ function renderLoop() {
     requestAnimationFrame(renderLoop)
 }
 
+//TODO add key up and down so they can hold
 window.addEventListener("keydown",(e)=>{
     switch (e.key) {
         case "w":
-            console.log(sim.move_pc('u'.charCodeAt()))
+            sim.move_pc('u'.charCodeAt())
             pull_data = true;
             break;
         case "a":

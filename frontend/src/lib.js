@@ -419,8 +419,6 @@ class Layer {
       Math.abs(end.x - start.x) / columns,
       Math.abs(end.y - start.y) / rows
     ]
-    console.log(stepX, "stepx")
-    console.log(stepY, "STEPY")
     let { x: startX, y: startY } = start
 
     for (let i = 0; i < rows * columns; i++) {
@@ -558,7 +556,6 @@ export async function init(canvas,filename) {
   let { img, atlas } = await genAtlas(filename)
   ATLAS = atlas
   layers = new Layers(canvas, img)
-  console.log(layers)
 }
 
 /**

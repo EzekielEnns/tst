@@ -3,6 +3,9 @@
   <head>
     <meta charset="utf-8">
     <title>Hello wasm-pack!</title>
+    <!--
+        npx tailwindcss -i ./index.css -o ./dist/output.css --watch
+        --->
     <link rel="icon" href="data:,">
     <style>
       html, head, body {
@@ -12,19 +15,25 @@
       }
 
       #canvas {
-        width: 800px;
-        height: 800px;
+        width: 600px;
+        height: 600px;
         background-color: wheat;
         /* Help to illustrate the rasterizer's job: when artificially lowering resolution, show pixelated image */
         image-rendering: crisp-edges;
       }
     </style>
+  <link href="./dist/output.css" rel="stylesheet">
   </head>
-  <body id="test">
-     <canvas id="canvas" width="800px" height="800px">
-      HTML5 canvas not supported in your browser! These demos will not work.
-    </canvas>
-    <noscript>This page contains webassembly and javascript content, please enable javascript in your browser.</noscript>
-    <script type="module" src="./index.js"></script>
+  <body id="test" >
+      <div class="flex w-full flex-col items-center ">
+          <canvas id="canvas" width="600px" height="600px">
+              HTML5 canvas not supported in your browser! These demos will not work.
+          </canvas>
+          <noscript>This page contains webassembly and javascript content, please enable javascript in your browser.</noscript>
+          <div>
+              <button class="bg-white">Hello</button>
+          </div>
+          <script type="module" src="./index.js"></script>
+      </div>
   </body>
 </html>

@@ -38,9 +38,14 @@ function getSkillData(){
     skPtr = sim.render_skills(skPtr,skLen)
     skLen = sim.get_len_skills()
     let buff = new Uint8Array(memeory.buffer,skPtr,skLen)
-    return bencode.decode(buff)
+    return bencode.decode(buff,)
 }
 console.log(JSON.stringify(getSkillData(),null, 2))
+//FIXME, coming out as a bizzare object, need to fix
+const dt = new TextDecoder();
+//TODO start creating data/class deffentions for these
+console.log(dt.decode(getSkillData()[0][0].name))
+console.log(dt.decode(getSkillData()[0][0].cost.hp))
 
 await init(cnv,font)
 //map layer

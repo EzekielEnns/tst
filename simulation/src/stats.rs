@@ -1,22 +1,32 @@
 use std::{ops, f32};
-use serde::Serialize;
+use serde::{Serializer,Serialize, ser::SerializeStruct};
 
-#[derive(Serialize,Default, Clone,PartialEq,Copy)]
+#[derive(Default, Clone,PartialEq,Copy)]
 pub struct Stats {
     pub hp: f32,
     pub sp: f32,
     pub status:[i32;1]
     //FIXME add speed/enum
 }
-
-impl Stats {
-    fn regulate(&mut self, nrm:Stats) {
-        //this function approches the values 
-        //adding to stamina, decrementing status
-        //hp is ignored (allows for overflow of hp)
-        //i.e. hp is unregulated
-        todo!()
+impl Serialize for Stats {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        let mut state = serializer.serialize_struct("Stats", 2)?;
+        state.serialize_field("hp",&self.hp.to_string())?;
+        state.serialize_field("sp",&self.sp.to_string())?;
+        state.end()
     }
+}
+impl Stats {
+    // fn regulate(&mut self, nrm:Stats) {
+    //     //this function approches the values 
+    //     //adding to stamina, decrementing status
+    //     //hp is ignored (allows for overflow of hp)
+    //     //i.e. hp is unregulated
+    //     todo!()
+    // }
 }
 
 impl ops::Add<Stats> for Stats {

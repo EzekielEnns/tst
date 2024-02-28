@@ -39,7 +39,7 @@ function getRenderData(){
  * @property {Stat} effect
  * @property {string} name
  *
- * @returns {Array<Skill>}
+ * @returns {Array<Skill|undefined>}
  */
 function getSkillData(){
     skPtr = sim.render_skills(skPtr,skLen)
@@ -57,11 +57,16 @@ function getSkillData(){
     for (let i = 0; i < data.length; i ++) {
         let raw = data[i][0]
         if (raw) {
-            //decode parts of array
-            //into obj
+            //these are objects/tags for 
+            ["cost","effect"].forEach((e)=>{
+                raw[e].hp = dt.decode(raw[e].hp)
+                raw[e].sp = dt.decode(raw[e].sp)
+            })
+            raw.name = dt.decode(raw.name)
         }
+        data[i] = raw
     }
-    return 
+    return data
 }
 /* reffrence
 [

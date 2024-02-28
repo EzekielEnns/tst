@@ -29,6 +29,7 @@ impl Serialize for Skill {
     {
         let mut state = serializer.serialize_struct("Skill", 2)?;
         state.serialize_field("cost", &self.cost)?;
+        state.serialize_field("effect", &self.effect)?;
         state.serialize_field("name", self.name)?;
         state.end()
     }

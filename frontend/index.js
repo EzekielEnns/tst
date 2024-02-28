@@ -32,20 +32,69 @@ function getRenderData(){
 }
 /**
  * @typedef {Object} Stat
- * @typedef {Object} SkillData
+ * @property {string} hp
+ * @property {string} sp
+ * @typedef {Object} Skill
+ * @property {Stat} cost
+ * @property {Stat} effect
+ * @property {string} name
+ *
+ * @returns {Array<Skill>}
  */
 function getSkillData(){
     skPtr = sim.render_skills(skPtr,skLen)
     skLen = sim.get_len_skills()
     let buff = new Uint8Array(memeory.buffer,skPtr,skLen)
-    return bencode.decode(buff,)
+
+    /** @type {Array<any>}*/
+    let data =bencode.decode(buff,) 
+    console.log(JSON.stringify(data,null, 2))
+    //FIXME, coming out as a bizzare object, need to fix
+    const dt = new TextDecoder();
+    //TODO start creating data/class deffentions for these
+    console.log(dt.decode(data[0][0].name))
+    console.log(dt.decode(data[0][0].cost.hp))
+    for (let i = 0; i < data.length; i ++) {
+        let raw = data[i][0]
+        if (raw) {
+            //decode parts of array
+            //into obj
+        }
+    }
+    return 
 }
-console.log(JSON.stringify(getSkillData(),null, 2))
-//FIXME, coming out as a bizzare object, need to fix
-const dt = new TextDecoder();
-//TODO start creating data/class deffentions for these
-console.log(dt.decode(getSkillData()[0][0].name))
-console.log(dt.decode(getSkillData()[0][0].cost.hp))
+/* reffrence
+[
+  [
+    {
+      "cost": {
+        "hp": {
+          "0": 48
+        },
+        "sp": {
+          "0": 48
+        }
+      },
+      "name": {
+        "0": 68,
+        "1": 85,
+        "2": 77,
+        "3": 77,
+        "4": 89,
+        "5": 32,
+        "6": 83,
+        "7": 75,
+        "8": 73,
+        "9": 76,
+        "10": 76
+      }
+    }
+  ],
+  [],
+  [],
+  []
+] index.js:43:8
+*/
 
 await init(cnv,font)
 //map layer

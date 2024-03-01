@@ -12,26 +12,52 @@
         margin: 0;
         padding: 25px;
         background-color: #2a2a2a;
+        overflow: hidden;
       }
 
       #canvas {
         width: 600px;
         height: 600px;
         background-color: wheat;
-        /* Help to illustrate the rasterizer's job: when artificially lowering resolution, show pixelated image */
         image-rendering: crisp-edges;
+        margin-top: 1em;
+        margin-bottom: 1em;
       }
+      .btn {
+          background-color: white;
+          height: 5em;
+          width: 5em;
+          margin: 1em;
+      }
+      #btnHolder {
+        padding: 1em;
+      }
+      .stat{ width: 100%; color: white; padding-left: 0.5em;}
+      .low{ width: 30%; }
+      .stamina { background-color: green; }
+      .hp { background-color: red; }
+      .hide {visibility: hidden;} /*easy to remove*/
     </style>
   <link href="./dist/output.css" rel="stylesheet">
   </head>
   <body id="test" >
+      <!--TODO make this center everything on every screen-->
       <div class="flex w-full flex-col items-center ">
-          <canvas id="canvas" width="600px" height="600px">
-              HTML5 canvas not supported in your browser! These demos will not work.
-          </canvas>
-          <noscript>This page contains webassembly and javascript content, please enable javascript in your browser.</noscript>
           <div>
-              <button class="bg-white">Hello</button>
+              <div id="enemey-hp" class="hide stat hp" >&nbsp;</div>
+              <div id="enemey-sp" class="hide stat stamina" >&nbsp;</div>
+              <canvas id="canvas" width="600px" height="600px">
+                  HTML5 canvas not supported in your browser! These demos will not work.
+              </canvas>
+              <noscript>This page contains webassembly and javascript content, please enable javascript in your browser.</noscript>
+              <div id="player-hp" class="stat hp " >100 &nbsp;</div>
+              <div id="player-sp" class="stat stamina" >&nbsp;</div>
+          </div>
+          <div id="btnHolder">
+              <button id="0" class="btn">right</button>
+              <button id="1" class="btn">down</button>
+              <button id="2" class="btn">up</button>
+              <button id="3" class="btn">left</button>
           </div>
           <script type="module" src="./index.js"></script>
       </div>

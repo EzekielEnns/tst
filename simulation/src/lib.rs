@@ -65,11 +65,13 @@ pub unsafe extern "C" fn get_len()-> usize {
 }
 
 //REMINDER, all external functions are player focused
+#[no_mangle]
 pub unsafe extern "C" fn turn(index:usize) {
     WORLD.add_skill(IdxActor::PLAYER as usize, index );
 }
+#[no_mangle]
 pub unsafe extern "C" fn end_turn() { }
-//renders players skills, all 4 of them
+
 #[no_mangle]
 pub unsafe extern "C" fn render_skills(ptr: *mut u8, size: usize)-> *mut u8 {
     WORLD.pack_skill_buff(ptr, size)
@@ -78,10 +80,12 @@ pub unsafe extern "C" fn render_skills(ptr: *mut u8, size: usize)-> *mut u8 {
 pub unsafe extern "C" fn get_len_skills() -> usize {
     WORLD.buff_lens[IdxBfLen::SKILLS as usize]
 }
-//renders team stats for player and enemey
+
+#[no_mangle]
 pub unsafe extern "C" fn render_stats() -> *mut u8{
     todo!()
 }
+#[no_mangle]
 pub unsafe extern "C" fn get_len_stats() -> usize {
     todo!()
 }

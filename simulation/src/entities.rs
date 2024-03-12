@@ -1,5 +1,5 @@
 use crate::render::RenderValue;
-use crate::skills::{Combo, Skill};
+use crate::skills::{Combo, Skill, Team};
 use crate::stats::Stats;
 
 //this class represents how a system gets rendered
@@ -41,6 +41,10 @@ impl Actor {
         let combo = &mut self.combos[index];
         let cb_index = combo.increment(); //note this is the last index
         combo.combo[cb_index]
+    }
+    
+    pub fn add_to_team(&self, team: &mut Team){
+        todo!()
     }
 }
 impl Entity for Actor {

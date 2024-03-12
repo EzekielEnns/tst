@@ -36,7 +36,6 @@ impl Serialize for Skill {
 }
 
 pub struct Combo {
-    //None will be used as a single that they are done
     pub combo: Vec<Option<&'static Skill>>,
     pub index: usize,
 }
@@ -66,7 +65,7 @@ impl Team {
     fn apply_dmg(&mut self, dmg: Stats) -> Stats {
         self.stats -= self.damage.iter().fold(dmg, |a, &b| {
             //TODO deal with modifers
-            //TODO deal with overload
+            //TODO deal with overflow
             a - b.effect
         });
         self.stats
@@ -111,28 +110,24 @@ impl Team {
 }
 
 impl World {
-    pub fn add_skill(&mut self, actor: usize, skill: usize) {
+    fn get_team(&mut self, actor: usize)-> &mut Team {
         let is_hostile = self.actors[actor].is_hostile;
-        if let Some(sk) = self.actors[actor].progress_skill(skill) {
             if is_hostile {
-                self.teams[IdxTeam::HOSTILE as usize].add_skill(sk);
+                &mut self.teams[IdxTeam::HOSTILE as usize]
             }
             else {
-                self.teams[IdxTeam::PLAYER as usize].add_skill(sk);
+                &mut self.teams[IdxTeam::PLAYER as usize]
             }
+
+    }
+
+    pub fn add_skill(&mut self, actor: usize, skill: usize) {
+        if let Some(sk) = self.actors[actor].progress_skill(skill) {
+            self.get_team(actor).add_skill(sk);
         }
     }
-    fn del_skill() {
-        todo!()
-        //decrmenets combos on entity
-        //removes skill from team
-    }
-    fn find_path() -> Stats {
-        //will find a path and calcualte cost
-        todo!()
-    }
-    fn apply_path() -> Stats {
-        //will do a path for given entity
-        todo!()
+    pub fn apply_dmg(&mut self, actor: usize) {
+        //apply dmg to other teams
+        todo!();
     }
 }

@@ -72,6 +72,7 @@ impl World{
 
     //this needs some testing 
     fn move_actor(&mut self, index:usize, new:usize) -> bool {
+        //TODO check for combat state, ignore if found
         //check for collison
         if self.tiles[new].collision {
             return false

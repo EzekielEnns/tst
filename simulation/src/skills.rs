@@ -126,8 +126,12 @@ impl World {
             self.get_team(actor).add_skill(sk);
         }
     }
-    pub fn apply_dmg(&mut self, actor: usize) {
-        //apply dmg to other teams
-        todo!();
+    pub fn apply_dmg(&mut self, attacker: usize, deffender: usize) {
+        let dmg = self.get_team(attacker).get_dmg();
+        self.get_team(deffender).apply_dmg(dmg);
+    }
+
+    pub fn start_turn(&mut self, actor: usize) {
+        self.get_team(actor).rest();
     }
 }

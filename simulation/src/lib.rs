@@ -70,7 +70,10 @@ pub unsafe extern "C" fn turn(index:usize) {
     WORLD.add_skill(IdxActor::PLAYER as usize, index );
 }
 #[no_mangle]
-pub unsafe extern "C" fn end_turn() { }
+pub unsafe extern "C" fn end_turn() { 
+    //dose player attack, resets ai, dose ai attack, resets player
+    todo!()
+}
 
 #[no_mangle]
 pub unsafe extern "C" fn render_skills(ptr: *mut u8, size: usize)-> *mut u8 {
@@ -83,6 +86,7 @@ pub unsafe extern "C" fn get_len_skills() -> usize {
 
 #[no_mangle]
 pub unsafe extern "C" fn render_stats() -> *mut u8{
+    //returns teams stats in array 
     todo!()
 }
 #[no_mangle]

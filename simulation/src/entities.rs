@@ -44,7 +44,9 @@ impl Actor {
     }
     
     pub fn add_to_team(&self, team: &mut Team){
-        todo!()
+        for i in self.items.iter() {
+            team.max += i.modifyer;
+        }
     }
 }
 impl Entity for Actor {

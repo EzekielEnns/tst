@@ -57,7 +57,6 @@ impl World{
         let len = width*height;
         World {
             dim: Pos{y:height,x:width},
-            //TODO fix this so that i can use with_capacity
             actors: Vec::<Actor>::with_capacity(len),
             actor_locations: Vec::<usize>::with_capacity(len),
             items: Vec::<Item>::with_capacity(len),
@@ -65,22 +64,24 @@ impl World{
             tiles: Vec::<Tile>::with_capacity(len),
             buff_lens: [0;3],
             teams:Vec::<Team>::with_capacity(2),
-          //  actor_render_len: 0,
         }
     }
     fn len(&self)->usize{self.dim.x*self.dim.y}
 
     //this needs some testing 
     fn move_actor(&mut self, index:usize, new:usize) -> bool {
-        //TODO check for combat state, ignore if found
-        //check for collison
+        if self.teams.len() > 1 {
+           //combat has been started
+           return false;
+        }
         if self.tiles[new].collision {
-            return false
+            return false;
         }
         else if let Some(collision) = self.actor_locations.iter().position(|&v| v==new) {
             let actor = &self.actors[collision];
             if actor.is_hostile {
-                //TODO start combat 
+                todo!();
+                //start combat 
                 return false;
             }
 

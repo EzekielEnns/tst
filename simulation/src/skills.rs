@@ -53,6 +53,7 @@ impl Combo {
     }
 }
 
+#[derive(Default)]
 pub struct Team {
     pub stats: Stats,
     pub max: Stats,

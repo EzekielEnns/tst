@@ -43,6 +43,7 @@ impl Actor {
         combo.combo[cb_index]
     }
     
+    //TODO move to teams
     pub fn add_to_team(&self, team: &mut Team){
         for i in self.items.iter() {
             team.max += i.modifyer;

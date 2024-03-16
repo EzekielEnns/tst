@@ -71,8 +71,10 @@ pub unsafe extern "C" fn turn(index:usize) {
 }
 #[no_mangle]
 pub unsafe extern "C" fn end_turn() { 
-    //dose player attack, resets ai, dose ai attack, resets player
-    todo!()
+    WORLD.apply_dmg(IdxActor::PLAYER as usize, 1);
+    WORLD.start_turn(1);
+    WORLD.add_skill(1,0);
+    WORLD.apply_dmg(1,IdxActor::PLAYER as usize);
 }
 
 #[no_mangle]

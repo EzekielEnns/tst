@@ -52,7 +52,7 @@ pub struct World {
 #[repr(usize)]
 pub enum IdxBfLen {
     RENDER = 0,
-    STATSPLY,
+    STATS,
     SKILLS,
 }
 #[repr(usize)]

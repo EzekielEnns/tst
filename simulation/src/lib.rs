@@ -87,13 +87,12 @@ pub unsafe extern "C" fn get_len_skills() -> usize {
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn render_stats() -> *mut u8{
-    //returns teams stats in array 
-    todo!()
+pub unsafe extern "C" fn render_stats(ptr: *mut u8, size: usize) -> *mut u8{
+    WORLD.pack_stats_buff(ptr,size)
 }
 #[no_mangle]
 pub unsafe extern "C" fn get_len_stats() -> usize {
-    todo!()
+    WORLD.buff_lens[IdxBfLen::STATS as usize]
 }
 
 #[cfg(test)]

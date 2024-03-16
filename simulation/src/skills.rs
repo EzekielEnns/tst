@@ -1,4 +1,7 @@
-use crate::{stats::Stats, world::{World, IdxTeam}};
+use crate::{
+    stats::Stats,
+    world::{IdxTeam, World, IdxBfLen},
+};
 use serde::{ser::SerializeStruct, Serialize};
 
 #[derive(PartialEq)]
@@ -40,7 +43,7 @@ pub struct Combo {
     pub index: usize,
 }
 impl Combo {
-    pub fn increment(&mut self) -> usize{
+    pub fn increment(&mut self) -> usize {
         let last = self.index;
         if self.combo[last] != None {
             self.index = if self.index + 1 >= self.combo.len() {
@@ -111,15 +114,13 @@ impl Team {
 }
 
 impl World {
-    fn get_team(&mut self, actor: usize)-> &mut Team {
+    fn get_team(&mut self, actor: usize) -> &mut Team {
         let is_hostile = self.actors[actor].is_hostile;
-            if is_hostile {
-                &mut self.teams[IdxTeam::HOSTILE as usize]
-            }
-            else {
-                &mut self.teams[IdxTeam::PLAYER as usize]
-            }
-
+        if is_hostile {
+            &mut self.teams[IdxTeam::HOSTILE as usize]
+        } else {
+            &mut self.teams[IdxTeam::PLAYER as usize]
+        }
     }
 
     pub fn add_skill(&mut self, actor: usize, skill: usize) {
@@ -134,5 +135,21 @@ impl World {
 
     pub fn start_turn(&mut self, actor: usize) {
         self.get_team(actor).rest();
+    }
+
+    pub unsafe fn pack_stats_buff(&mut self, old: *mut u8, size: usize) -> *mut u8 {
+        if old != std::ptr::null_mut() && size != 0 {
+            std::mem::drop(Vec::from_raw_parts(old, size, size));
+        }
+        let mut buff = bendy::serde::to_bytes(&[
+            &self.teams[IdxTeam::PLAYER as usize].stats,
+            &self.teams[IdxTeam::HOSTILE as usize].stats,
+        ])
+        .unwrap();
+        let len = buff.len();
+        self.buff_lens[IdxBfLen::STATS as usize] = len;
+        let ptr = buff.as_mut_ptr();
+        std::mem::forget(buff);
+        ptr
     }
 }

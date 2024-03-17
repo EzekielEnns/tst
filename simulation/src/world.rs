@@ -106,10 +106,10 @@ impl World {
                 }
                 for i in self.actors.iter() {
                     if i.is_hostile {
-                        i.add_to_team(&mut self.teams[IdxTeam::HOSTILE as usize])
+                        i.add_to_team(&mut self.teams[IdxTeam::HOSTILE as usize]);
                     }
                     else {
-                        i.add_to_team(&mut self.teams[IdxTeam::PLAYER as usize])
+                        i.add_to_team(&mut self.teams[IdxTeam::PLAYER as usize]);
                     }
                 }
                 return false;

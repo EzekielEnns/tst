@@ -52,7 +52,8 @@ pub unsafe extern "C" fn move_pc(d:u8) -> bool {
         _ => {}
     };
     let new = get_index(&WORLD.dim,&ply);
-    move_player(&mut WORLD,new)
+    move_player(&mut WORLD,new);
+    WORLD.teams.len() == 0
 }
 
 #[no_mangle]
@@ -97,14 +98,15 @@ pub unsafe extern "C" fn get_len_stats() -> usize {
 
 #[cfg(test)]
 mod tests {
-    use crate::move_pc;
+    use crate::{ WORLD, world::{get_index, Pos, move_player}, render_stats};
 
 
     #[test]
     fn it_works() {
             unsafe {
-                move_pc(b'u');
+                move_player(&mut WORLD, get_index(&WORLD.dim, &Pos{x:1,y:1}));
+                render_stats(std::ptr::null_mut(),0);
+                panic!()
             }
-            panic!()
     }
 }

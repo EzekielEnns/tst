@@ -141,6 +141,10 @@ impl World {
         if old != std::ptr::null_mut() && size != 0 {
             std::mem::drop(Vec::from_raw_parts(old, size, size));
         }
+        if self.teams.len() == 0 {
+            self.buff_lens[IdxBfLen::STATS as usize] = 0;
+            return std::ptr::null_mut();
+        }
         let mut buff = bendy::serde::to_bytes(&[
             &self.teams[IdxTeam::PLAYER as usize].stats,
             &self.teams[IdxTeam::HOSTILE as usize].stats,

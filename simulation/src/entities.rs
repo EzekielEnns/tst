@@ -46,6 +46,8 @@ impl Actor {
     //TODO move to teams
     pub fn add_to_team(&self, team: &mut Team){
         for i in self.items.iter() {
+            //TODO bad code ik
+            team.stats += i.modifyer;
             team.max += i.modifyer;
         }
     }

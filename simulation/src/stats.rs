@@ -69,7 +69,7 @@ impl ops::AddAssign for Stats {
     fn add_assign(&mut self, rhs: Self) {
         self.hp += rhs.hp;
         self.sp += rhs.sp;
-        for i in 0..=self.status.len() {
+        for i in 0..self.status.len() {
             self.status[i] += rhs.status[i]
         }
     }

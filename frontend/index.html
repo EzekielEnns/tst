@@ -6,6 +6,7 @@
     <!--
         npx tailwindcss -i ./index.css -o ./dist/output.css --watch
         --->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <link rel="icon" href="data:,">
     <style>
       html, head, body {
@@ -26,10 +27,13 @@
       .btn {
           background-color: white;
           height: 5em;
-          width: 5em;
+          width: 10em;
           margin: 1em;
+          padding: 1em;
+          user-select: none; 
       }
       #btnHolder {
+        display:flex;
         padding: 1em;
       }
       .stat{ width: 100%; color: white; padding-left: 0.5em;}
@@ -50,14 +54,14 @@
                   HTML5 canvas not supported in your browser! These demos will not work.
               </canvas>
               <noscript>This page contains webassembly and javascript content, please enable javascript in your browser.</noscript>
-              <div id="player-hp" class="stat hp " >100 &nbsp;</div>
-              <div id="player-sp" class="stat stamina" >&nbsp;</div>
+              <div class="stat hp player" >100 &nbsp;</div>
+              <div class="stat stamina player" >&nbsp;</div>
           </div>
           <div id="btnHolder">
-              <button id="0" class="btn">right</button>
-              <button id="1" class="btn">down</button>
-              <button id="2" class="btn">up</button>
-              <button id="3" class="btn">left</button>
+              <div id="a" class="btn">right</div>
+              <div id="s" class="btn">down</div>
+              <div id="w" class="btn">up</div>
+              <div id="d" class="btn">left</div>
           </div>
           <script type="module" src="./index.js"></script>
       </div>

@@ -13,6 +13,7 @@ var/** @type {number} */ ptr = sim.get_buffs(),
    /** @type {HTMLCanvasElement} */ cnv = document.getElementById("canvas")
 /** @type {WebAssembly.Memory} */
 var memeory = sim.memory;
+var pull_data = true;
 
 /**
  * @typedef {Object} RenderBuffers
@@ -64,8 +65,11 @@ function getSkillData() {
     }
     return data
 }
-console.log(getSkillData())
 
+/**
+ *
+ * @returns {Array<Stat>}
+ */
 function getStatsData() {
     stPtr = sim.render_stats(stPtr, stLen);
     stLen = sim.get_len_stats();
@@ -80,6 +84,43 @@ function getStatsData() {
         }
     }
     return data
+}
+
+/* rendering combat/interfacing 
+ *  update stats/pull stats
+ *      div class stat
+ *  update skills/skill buttons....
+ *
+ *
+ *
+ *  so combat will be selfcontained,
+ *  on combat start we will trigger the get combat info function,
+ *
+ *  this will call the getStats() function
+ *  that updates 
+ *
+ *
+ */
+
+function getStats(){
+    //sets all stats to visible
+    //pulls stats
+    //update par widths
+    for (const i of document.querySelectorAll('.stat') ) {
+        //TODO display all stats/go through class list
+        //add unhidden stuff tooo/remove hide class
+        i.classList.remove('hide')
+    }
+}
+
+function getSkills(){
+    //updates text notes inside buttons/display
+    //update skill array (global to file)
+}
+
+function combat_init(){
+    getStats();
+    getSkills()
 }
 
 await init(cnv, font)
@@ -103,7 +144,6 @@ addLayer({
         noFill: true
     }
 }, 3) //TODO add a way to add quads and remove quads
-var pull_data = true;
 
 function renderLoop() {
     if (pull_data) {
@@ -127,7 +167,6 @@ function renderLoop() {
         }
         //clearing unused cells
         for (let i = offset + rd.items.len; i < ply.getLen(); i++) {
-            //FIXME/TODO grow and shrink a layer
             ply.setQuadTex(i, ' ');
         }
         pull_data = false;
@@ -136,10 +175,40 @@ function renderLoop() {
     requestAnimationFrame(renderLoop)
 }
 
+for (const i of document.querySelector('#btnHolder').children) {
+    i.addEventListener("click",()=>{
+        passInput(i.id)
+    })
+}
+
+
+
 //TODO add key up and down so they can hold
 window.addEventListener("keydown", (e) => {
-    let dir;
-    switch (e.key) {
+    passInput(e.key)
+})
+
+
+function passInput(key){
+    let is_combat = exploration(key);
+    if (is_combat) {
+        //check if combet is running
+        combat_init();
+        /*
+         * write a promise maybe to wait for player turn to be procssed 
+         *      1. get moves from player
+         *      2. update stats, on adding a turn
+         *      3. end turn
+         *      4. update stats // should also check for win (zero hp)
+         *      5. do enemy turn
+         */
+    }
+
+}
+
+function exploration(key){
+    let dir
+    switch (key) {
         case "w":
             dir = 'u'
             pull_data = true;
@@ -157,14 +226,22 @@ window.addEventListener("keydown", (e) => {
             pull_data = true;
             break;
     }
-    let is_combat = !sim.move_pc(dir?.charCodeAt())
-    if (is_combat) {
-        console.log(getStatsData())
-        alert("FIGHT")
+    return !sim.move_pc(dir?.charCodeAt())
+}
+
+//for combat
+function getKeyIndex(key) {
+    switch (key) {
+        case "w":
+            return 0
+        case "a":
+            return 1
+        case "s":
+            return 2
+        case "d":
+            return 3
     }
-})
-
-
+}
 
 //https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame
 requestAnimationFrame(renderLoop)

@@ -34,13 +34,15 @@
       }
       #btnHolder {
         display:flex;
-        padding: 1em;
+        padding: 0px 1em 1em 1em;
       }
       .stat{ width: 100%; color: white; padding-left: 0.5em;}
       .low{ width: 30%; }
       .stamina { background-color: green; }
       .hp { background-color: red; }
       .hide {visibility: hidden;} /*easy to remove*/
+      #endturn{ postion: absolute; zindex: 1; background-color: white; text-align: center; 
+          margin: 0.4em 0.2em 0px 0.2em;}
     </style>
   <link href="./dist/output.css" rel="stylesheet">
   </head>
@@ -56,6 +58,7 @@
               <noscript>This page contains webassembly and javascript content, please enable javascript in your browser.</noscript>
               <div class="stat hp player" >100 &nbsp;</div>
               <div class="stat stamina player" >&nbsp;</div>
+              <div id="endturn" class="hide">end turn</div>
           </div>
           <div id="btnHolder">
               <div id="a" class="btn">right</div>

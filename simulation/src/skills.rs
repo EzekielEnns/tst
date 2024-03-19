@@ -147,7 +147,9 @@ impl World {
         }
         let mut buff = bendy::serde::to_bytes(&[
             &self.teams[IdxTeam::PLAYER as usize].stats,
+            &self.teams[IdxTeam::PLAYER as usize].max,
             &self.teams[IdxTeam::HOSTILE as usize].stats,
+            &self.teams[IdxTeam::HOSTILE as usize].max,
         ])
         .unwrap();
         let len = buff.len();

@@ -93,7 +93,7 @@ impl ops::SubAssign for Stats {
         else {
             self.sp -= rhs.sp;
         }
-        for i in 0..=self.status.len() {
+        for i in 0..self.status.len() {
             self.status[i] -= rhs.status[i]
         }
     }

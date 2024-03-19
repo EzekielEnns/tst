@@ -31,8 +31,8 @@ static mut WORLD: Lazy<World> = Lazy::new(|| {
 static SKILLS: [Skill;1] = [
     Skill {
         name:"DUMMY SKILL",
-        cost: Stats {hp:0.0,sp:0.0,status:[0;1]},
-        effect: Stats {hp:0.0,sp:0.0,status:[0;1]},
+        cost: Stats {hp:0.0,sp:5.0,status:[0;1]},
+        effect: Stats {hp:5.0,sp:0.0,status:[0;1]},
         deffense: false,
         reach: 0,
     }
@@ -98,15 +98,15 @@ pub unsafe extern "C" fn get_len_stats() -> usize {
 
 #[cfg(test)]
 mod tests {
-    use crate::{ WORLD, world::{get_index, Pos, move_player}, render_stats};
+    use crate::{ WORLD, world::{get_index, Pos, move_player}, render_stats, turn};
 
 
     #[test]
     fn it_works() {
             unsafe {
                 move_player(&mut WORLD, get_index(&WORLD.dim, &Pos{x:1,y:1}));
-                render_stats(std::ptr::null_mut(),0);
-                panic!()
+                turn(0);
+
             }
     }
 }

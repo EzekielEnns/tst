@@ -97,7 +97,7 @@ function setStats() {
 
         if (i.classList.contains("hp")) {
             i.textContent = current.hp.toString();
-            i.setAttribute("style", `width:${(current.hp / max.hp) * 100.0}%`);
+            i.setAttribute("style", `width:${Math.max(current.hp / max.hp,0) * 100.0}%`);
         } else {
             i.textContent = data[index].sp.toString();
             i.setAttribute("style", `width:${(current.sp / max.sp) * 100.0}%`);
@@ -106,9 +106,10 @@ function setStats() {
     return data[0].hp <= 0 || data[2].hp <= 0;
 }
 function unsetStats() {
-    for (const i of document.querySelectorAll(".stat")) { 
-            i.classList.add("hide");
+    for (const i of document.querySelectorAll(".stat")) {
+        i.classList.add("hide");
     }
+    document.querySelector("#endturn").classList.add("hide");
 }
 
 function setSkills() {
@@ -122,22 +123,22 @@ function setSkills() {
 
 function unsetSkills() {
     for (let i = 0; i < buttons.length; i++) {
-        let text = ""
+        let text = "";
         switch (buttons[i].id) {
             case "w":
-                text = "up"
+                text = "up";
                 break;
             case "a":
-                text = "left"
+                text = "left";
                 break;
             case "s":
-                text = "down"
+                text = "down";
                 break;
             case "d":
-                text = "right"
+                text = "right";
                 break;
         }
-        buttons[i].textContent = text
+        buttons[i].textContent = text;
     }
 }
 await init(cnv, font);
@@ -226,17 +227,18 @@ function passInput(key) {
     }
 }
 function endTurn() {
-    let combat_done = sim.end_turn()
-    console.log(combat_done)
+    let combat_done = sim.end_turn();
+    setStats();
+    console.log(combat_done);
     if (combat_done) {
-
         let didPlayerWin = sim.clean_combat();
-        unsetSkills()
+        unsetSkills();
         unsetStats();
         fistCombat = true;
         pull_data = true;
+    } else {
+        setSkills();
     }
-    setSkills();
 }
 
 function exploration(key) {
@@ -277,7 +279,9 @@ function turn(key) {
             break;
         case "d":
             index = 3;
-            break;
+        case " ":
+            endTurn();
+            return;
     }
     sim.turn(index);
 }

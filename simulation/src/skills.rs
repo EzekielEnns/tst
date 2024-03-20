@@ -1,10 +1,10 @@
 use crate::{
     stats::Stats,
-    world::{IdxTeam, World, IdxBfLen},
+    world::{IdxBfLen, IdxTeam, World},
 };
 use serde::{ser::SerializeStruct, Serialize};
 
-#[derive(PartialEq,Debug)]
+#[derive(PartialEq, Debug)]
 pub struct Skill {
     pub cost: Stats,
     pub effect: Stats,
@@ -57,7 +57,7 @@ impl Combo {
     }
 }
 
-#[derive(Default,Debug)]
+#[derive(Default, Debug)]
 pub struct Team {
     pub stats: Stats,
     pub max: Stats,
@@ -115,8 +115,25 @@ impl Team {
 }
 
 impl World {
+    fn need_preview(&self) -> bool {
+        return !self.teams[IdxTeam::PLAYER as usize].damage.is_empty();
+    }
+    fn get_enemy_preview(&self) -> Stats {
+        let mut preview = Stats::default();
+        let player = &self.teams[IdxTeam::PLAYER as usize];
+        let enemy = &self.teams[IdxTeam::HOSTILE as usize];
+        for i in player.damage.iter() {
+            preview += i.effect;
+        }
+
+        return enemy.stats - preview;
+    }
     pub fn get_looser(&mut self) -> usize {
-       return self.teams.iter().position(|r|r.stats.hp <= 0.0).unwrap_or(usize::MAX)
+        return self
+            .teams
+            .iter()
+            .position(|r| r.stats.hp <= 0.0)
+            .unwrap_or(usize::MAX);
     }
 
     fn get_team(&mut self, actor: usize) -> &mut Team {
@@ -150,10 +167,15 @@ impl World {
             self.buff_lens[IdxBfLen::STATS as usize] = 0;
             return std::ptr::null_mut();
         }
+        let enemy_stats = if self.need_preview() {
+            self.get_enemy_preview()
+        } else {
+            self.teams[IdxTeam::HOSTILE as usize].stats
+        };
         let mut buff = bendy::serde::to_bytes(&[
             &self.teams[IdxTeam::PLAYER as usize].stats,
             &self.teams[IdxTeam::PLAYER as usize].max,
-            &self.teams[IdxTeam::HOSTILE as usize].stats,
+            &enemy_stats,
             &self.teams[IdxTeam::HOSTILE as usize].max,
         ])
         .unwrap();

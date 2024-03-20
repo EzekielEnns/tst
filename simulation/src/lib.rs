@@ -79,6 +79,7 @@ pub unsafe extern "C" fn end_turn() -> bool {
     WORLD.start_turn(1);
     WORLD.add_skill(1,0);
     WORLD.apply_dmg(1,IdxActor::PLAYER as usize);
+    WORLD.start_turn(0);
     return false;
 }
 

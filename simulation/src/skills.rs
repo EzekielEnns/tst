@@ -4,7 +4,7 @@ use crate::{
 };
 use serde::{ser::SerializeStruct, Serialize};
 
-#[derive(PartialEq)]
+#[derive(PartialEq,Debug)]
 pub struct Skill {
     pub cost: Stats,
     pub effect: Stats,
@@ -38,6 +38,7 @@ impl Serialize for Skill {
     }
 }
 
+#[derive(Debug)]
 pub struct Combo {
     pub combo: Vec<Option<&'static Skill>>,
     pub index: usize,
@@ -56,7 +57,7 @@ impl Combo {
     }
 }
 
-#[derive(Default)]
+#[derive(Default,Debug)]
 pub struct Team {
     pub stats: Stats,
     pub max: Stats,
@@ -114,6 +115,10 @@ impl Team {
 }
 
 impl World {
+    pub fn get_looser(&mut self) -> usize {
+       return self.teams.iter().position(|r|r.stats.hp <= 0.0).unwrap_or(usize::MAX)
+    }
+
     fn get_team(&mut self, actor: usize) -> &mut Team {
         let is_hostile = self.actors[actor].is_hostile;
         if is_hostile {

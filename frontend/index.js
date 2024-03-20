@@ -105,6 +105,11 @@ function setStats() {
     }
     return data[0].hp <= 0 || data[2].hp <= 0;
 }
+function unsetStats() {
+    for (const i of document.querySelectorAll(".stat")) { 
+            i.classList.add("hide");
+    }
+}
 
 function setSkills() {
     let data = getSkillData();
@@ -115,6 +120,26 @@ function setSkills() {
     }
 }
 
+function unsetSkills() {
+    for (let i = 0; i < buttons.length; i++) {
+        let text = ""
+        switch (buttons[i].id) {
+            case "w":
+                text = "up"
+                break;
+            case "a":
+                text = "left"
+                break;
+            case "s":
+                text = "down"
+                break;
+            case "d":
+                text = "right"
+                break;
+        }
+        buttons[i].textContent = text
+    }
+}
 await init(cnv, font);
 //map layer
 addLayer({
@@ -189,9 +214,9 @@ function passInput(key) {
     if (is_combat) {
         if (fistCombat) {
             //set to true when combat done
-            let endturn = document.querySelector("#endturn")
-            endturn.classList.remove("hide")
-            endturn.addEventListener("click",endTurn)
+            let endturn = document.querySelector("#endturn");
+            endturn.classList.remove("hide");
+            endturn.addEventListener("click", endTurn);
             fistCombat = false;
         } else {
             turn(key);
@@ -201,13 +226,17 @@ function passInput(key) {
     }
 }
 function endTurn() {
-    sim.end_turn();
-    let gameOver = setStats();
-    if (gameOver) {
-        alert("game over");
-    } else {
-        setSkills();
+    let combat_done = sim.end_turn()
+    console.log(combat_done)
+    if (combat_done) {
+
+        let didPlayerWin = sim.clean_combat();
+        unsetSkills()
+        unsetStats();
+        fistCombat = true;
+        pull_data = true;
     }
+    setSkills();
 }
 
 function exploration(key) {

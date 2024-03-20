@@ -7,7 +7,7 @@ use crate::{
     skills::Team,
 };
 //TODO add animated entity
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy,Debug)]
 pub struct Pos {
     pub x: usize,
     pub y: usize,
@@ -58,6 +58,7 @@ pub enum IdxBfLen {
 #[repr(usize)]
 pub enum IdxActor {
     PLAYER = 0,
+    HOSTILE,
 }
 #[repr(usize)]
 pub enum IdxTeam {
@@ -93,7 +94,7 @@ impl World {
 
     //this needs some testing
     fn move_actor(&mut self, index: usize, new: usize) -> bool {
-        if self.teams.len() > 1 {
+        if self.teams.len() > 1 || self.actors.len() == 0 {
             return false;
         }
         if self.tiles[new].collision {
@@ -167,6 +168,9 @@ impl World {
     pub unsafe fn pack_skill_buff(&mut self, old: *mut u8, size: usize) -> *mut u8 {
         if old != std::ptr::null_mut() && size != 0 {
             std::mem::drop(Vec::from_raw_parts(old, size, size));
+        }
+        if self.actors.len() == 0 {
+            return std::ptr::null_mut();
         }
         let (ptr, len) = self.actors[IdxActor::PLAYER as usize].render_active_skills();
         self.buff_lens[IdxBfLen::SKILLS as usize] = len;

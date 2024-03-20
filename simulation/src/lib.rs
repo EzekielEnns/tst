@@ -13,7 +13,7 @@ use maps::{Generate, first_test_world};
 use once_cell::sync::Lazy;
 use skills::Skill;
 use stats::Stats;
-use world::{World, move_player, get_index, Pos, get_pos, IdxActor, IdxBfLen};
+use world::{World, move_player, get_index, Pos, get_pos, IdxActor, IdxBfLen, IdxTeam};
 mod utils;
 mod skills; 
 mod world;
@@ -71,12 +71,33 @@ pub unsafe extern "C" fn turn(index:usize) {
     WORLD.add_skill(IdxActor::PLAYER as usize, index );
 }
 #[no_mangle]
-pub unsafe extern "C" fn end_turn() { 
+pub unsafe extern "C" fn end_turn() -> bool { 
     WORLD.apply_dmg(IdxActor::PLAYER as usize, 1);
+    if WORLD.get_looser() != usize::MAX {
+        return true;
+    }
     WORLD.start_turn(1);
     WORLD.add_skill(1,0);
     WORLD.apply_dmg(1,IdxActor::PLAYER as usize);
+    return false;
 }
+
+#[no_mangle]
+pub unsafe extern "C" fn clean_combat()-> bool {
+    let looser_team_index = WORLD.get_looser();
+    WORLD.teams.clear();
+    if looser_team_index == IdxTeam::HOSTILE as usize{
+        WORLD.actors.remove(IdxActor::HOSTILE as usize);
+        WORLD.actor_locations.remove(IdxActor::HOSTILE as usize);
+    }
+    else if looser_team_index == IdxTeam::PLAYER as usize {
+        WORLD.actors.remove(IdxActor::PLAYER as usize);
+        WORLD.actor_locations.remove(IdxActor::PLAYER as usize);
+    }
+    
+    return looser_team_index != IdxTeam::PLAYER as usize;
+}
+
 
 #[no_mangle]
 pub unsafe extern "C" fn render_skills(ptr: *mut u8, size: usize)-> *mut u8 {
@@ -98,15 +119,19 @@ pub unsafe extern "C" fn get_len_stats() -> usize {
 
 #[cfg(test)]
 mod tests {
-    use crate::{ WORLD, world::{get_index, Pos, move_player}, render_stats, turn};
+
+    use crate::{ WORLD, world::{get_index, Pos, move_player, IdxTeam}, clean_combat};
 
 
     #[test]
     fn it_works() {
             unsafe {
                 move_player(&mut WORLD, get_index(&WORLD.dim, &Pos{x:1,y:1}));
-                turn(0);
-
+                println!("{:?}{:?}",WORLD.actors[0].render_value,WORLD.actors[1].render_value);
+                WORLD.teams[IdxTeam::HOSTILE as usize].stats.hp = 0.0;
+                clean_combat();
+                println!("{:?}{:?}",WORLD.actors[0].render_value,WORLD.actors.len());
+                panic!()
             }
     }
 }

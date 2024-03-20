@@ -11,6 +11,7 @@ pub trait Entity {
     fn get_mut(&mut self) -> &mut RenderValue;
 }
 
+#[derive(Debug)]
 pub struct Actor {
     pub render_value: RenderValue,
     pub items: Vec<Item>,
@@ -61,7 +62,7 @@ impl Entity for Actor {
     }
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy,Debug)]
 pub struct Tile {
     pub render_value: RenderValue,
     pub collision: bool,
@@ -74,7 +75,7 @@ impl Entity for Tile {
         self.render_value
     }
 }
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy,Debug)]
 pub struct Item {
     pub render_value: RenderValue,
     pub name: &'static str,

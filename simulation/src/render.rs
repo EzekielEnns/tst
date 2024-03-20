@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize, ser::SerializeStruct};
 
-#[derive(Serialize, Deserialize,Clone, Copy)]
+#[derive(Serialize, Deserialize,Clone, Copy,Debug)]
 pub struct RenderValue {
     pub text:u8,
     pub color:u8,

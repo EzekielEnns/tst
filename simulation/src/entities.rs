@@ -16,7 +16,6 @@ pub struct Actor {
     pub render_value: RenderValue,
     pub items: Vec<Item>,
     pub is_hostile: bool,
-    pub skills: Vec<&'static Skill>, // first 4 are the skills equipted
     pub combos: Vec<Combo>,
 }
 

@@ -55,12 +55,25 @@ pub fn first_test_world(w: &mut World) {
         modifyer: Stats{ hp:100.0, sp:100.0, status:[0;1]}.to_owned(),
         consumable: false,
     };
+    let punch = Combo {
+        index:0, combo:vec![Some(&SKILLS[0]),Some(&SKILLS[0]),Some(&SKILLS[0]),Some(&SKILLS[1])]
+    };
+    let kick = Combo {
+        index:0, combo:vec![Some(&SKILLS[2]),Some(&SKILLS[2]),Some(&SKILLS[3])]
+    };
+
+    let grapple = Combo {
+        index:0, combo:vec![Some(&SKILLS[4])]
+    };
+
+    let block  = Combo {
+        index:0, combo:vec![Some(&SKILLS[5]),Some(&SKILLS[5]),Some(&SKILLS[6])]
+    };
+   
+    let default_combo = vec![punch,kick,grapple,block];
+
     let player = Actor {
-        combos: vec![Combo {
-            index: 0,
-            combo: vec![Some(&SKILLS[0]); 1],
-        }],
-        skills: vec![&SKILLS[0]],
+        combos: default_combo.clone(),
         render_value: RenderValue {
             color: 80,
             text: b'@',
@@ -78,12 +91,8 @@ pub fn first_test_world(w: &mut World) {
     w.actor_locations.push(index);
 
     let enemy = Actor {
-        combos: vec![Combo {
-            index: 0,
-            combo: vec![Some(&SKILLS[0]); 1],
-        }],
+        combos: default_combo.clone(),
         is_hostile: true,
-        skills: vec![&SKILLS[0]],
         render_value: RenderValue {
             color: 80,
             text: b'*',
@@ -105,7 +114,7 @@ pub fn first_test_world(w: &mut World) {
             color: 25,
         },
         name: "coin",
-        modifyer: Stats::default().to_owned(),
+        modifyer: Stats {hp:200.0, sp:100.0, status:[0;1]}.to_owned(), 
         consumable: false,
     };
     center.y += 1;

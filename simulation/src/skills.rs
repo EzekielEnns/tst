@@ -38,7 +38,7 @@ impl Serialize for Skill {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug,Clone)]
 pub struct Combo {
     pub combo: Vec<Option<&'static Skill>>,
     pub index: usize,
@@ -118,14 +118,13 @@ impl World {
     fn need_preview(&self) -> bool {
         return !self.teams[IdxTeam::PLAYER as usize].damage.is_empty();
     }
-    fn get_enemy_preview(&self) -> Stats {
+    pub fn get_enemy_preview(&self) -> Stats {
         let mut preview = Stats::default();
         let player = &self.teams[IdxTeam::PLAYER as usize];
         let enemy = &self.teams[IdxTeam::HOSTILE as usize];
         for i in player.damage.iter() {
             preview += i.effect;
         }
-
         return enemy.stats - preview;
     }
     pub fn get_looser(&mut self) -> usize {

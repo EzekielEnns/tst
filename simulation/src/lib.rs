@@ -28,12 +28,61 @@ static mut WORLD: Lazy<World> = Lazy::new(|| {
     wl
 });
 
-static SKILLS: [Skill;1] = [
+static SKILLS: [Skill;7] = [
+    //main
     Skill {
-        name:"DUMMY SKILL",
-        cost: Stats {hp:0.0,sp:5.0,status:[0;1]},
-        effect: Stats {hp:5.0,sp:0.0,status:[0;1]},
+        name: "Punch",
+        cost: Stats {hp:0.0,sp: 5.0, status:[0;1]},
+        effect: Stats {hp:3.0, sp:0.0, status: [0;1]},
         deffense: false,
+        reach: 0,
+    },
+    //combo
+    Skill {
+        name: "Pumble",
+        cost: Stats {hp:0.0,sp: 5.0, status:[0;1]},
+        effect: Stats {hp:15.0, sp:10.0, status: [0;1]},
+        deffense: false,
+        reach: 0,
+    },
+    //main
+    Skill {
+        name: "Kick",
+        cost: Stats {hp:0.0,sp: 10.0, status:[0;1]},
+        effect: Stats {hp:10.0, sp:0.0, status: [0;1]},
+        deffense: false,
+        reach: 0,
+    },
+    //ultra
+    Skill {
+        name: "Round house",
+        cost: Stats {hp:0.0,sp: 20.0, status:[0;1]},
+        effect: Stats {hp:30.0, sp:30.0, status: [0;1]},
+        deffense: false,
+        reach: 0,
+    },
+    //main
+    Skill {
+        name: "Grapple",
+        cost: Stats {hp:0.0,sp: 5.0, status:[0;1]},
+        effect: Stats {hp:1.0, sp:10.0, status: [0;1]},
+        deffense: false,
+        reach: 0,
+    },
+    //main
+    Skill {
+        name: "Block",
+        cost: Stats {hp:0.0,sp: 5.0, status:[0;1]},
+        effect: Stats {hp:3.0, sp:0.0, status: [0;1]},
+        deffense: true,
+        reach: 0,
+    },
+    //second
+    Skill {
+        name: "Broken Gaurd",
+        cost: Stats {hp:2.0,sp: 5.0, status:[0;1]},
+        effect: Stats {hp:3.0, sp:0.0, status: [0;1]},
+        deffense: true,
         reach: 0,
     }
 ];
@@ -121,17 +170,15 @@ pub unsafe extern "C" fn get_len_stats() -> usize {
 #[cfg(test)]
 mod tests {
 
-    use crate::{ WORLD, world::{get_index, Pos, move_player, IdxTeam}, clean_combat};
+    use crate::{ WORLD, world::{get_index, Pos, move_player, IdxTeam}, clean_combat, end_turn, turn, render_stats};
 
 
     #[test]
     fn it_works() {
             unsafe {
                 move_player(&mut WORLD, get_index(&WORLD.dim, &Pos{x:1,y:1}));
-                println!("{:?}{:?}",WORLD.actors[0].render_value,WORLD.actors[1].render_value);
-                WORLD.teams[IdxTeam::HOSTILE as usize].stats.hp = 0.0;
-                clean_combat();
-                println!("{:?}{:?}",WORLD.actors[0].render_value,WORLD.actors.len());
+                turn(3);
+                WORLD.get_enemy_preview();
                 panic!()
             }
     }

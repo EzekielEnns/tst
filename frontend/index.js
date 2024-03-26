@@ -267,6 +267,7 @@ function exploration(key) {
 //for combat
 function turn(key) {
     let index;
+    console.log(key)
     switch (key) {
         case "a":
             index = 0;
@@ -279,6 +280,7 @@ function turn(key) {
             break;
         case "d":
             index = 3;
+            break;
         case " ":
             endTurn();
             return;

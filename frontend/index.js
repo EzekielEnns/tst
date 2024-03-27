@@ -77,6 +77,7 @@ function getStatsData() {
     let buff = new Uint8Array(memeory.buffer, stPtr, stLen);
     let data = bencode.decode(buff);
     const dt = new TextDecoder();
+    //TODO data becomes null 
     for (let i = 0; i < data.length; i++) {
         let raw = data[i];
         if (raw) {
@@ -211,7 +212,7 @@ window.addEventListener("keydown", (e) => {
 });
 
 function passInput(key) {
-    let is_combat = exploration(key);
+    let is_combat = sim.is_combat()
     if (is_combat) {
         if (fistCombat) {
             //set to true when combat done
@@ -222,14 +223,17 @@ function passInput(key) {
         } else {
             turn(key);
         }
-        setStats();
-        setSkills();
+        if (sim.is_combat()) {
+            setStats();
+            setSkills();
+        }
+    }
+    else {
+        exploration(key);
     }
 }
 function endTurn() {
     let combat_done = sim.end_turn();
-    setStats();
-    console.log(combat_done);
     if (combat_done) {
         let didPlayerWin = sim.clean_combat();
         unsetSkills();
@@ -237,6 +241,7 @@ function endTurn() {
         fistCombat = true;
         pull_data = true;
     } else {
+        setStats();
         setSkills();
     }
 }
@@ -260,6 +265,8 @@ function exploration(key) {
             dir = "r";
             pull_data = true;
             break;
+        default:
+            return;
     }
     return !sim.move_pc(dir?.charCodeAt());
 }
@@ -267,7 +274,6 @@ function exploration(key) {
 //for combat
 function turn(key) {
     let index;
-    console.log(key)
     switch (key) {
         case "a":
             index = 0;

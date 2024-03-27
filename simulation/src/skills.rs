@@ -67,12 +67,19 @@ pub struct Team {
 }
 
 impl Team {
-    fn apply_dmg(&mut self, dmg: Stats) -> Stats {
-        self.stats -= self.damage.iter().fold(dmg, |a, &b| {
-            //TODO deal with modifers
-            //TODO deal with overflow
-            a - b.effect
+    fn get_deffense(&mut self) -> Stats {
+        return self.deffense.drain(0..).fold(Stats::default(), | a, b| {
+            a+b.effect
         });
+    }
+    fn apply_dmg(&mut self, dmg: Stats) -> Stats {
+        let def =  self.get_deffense();
+        let results = self.damage.iter().fold(dmg, |a, &b| {
+            a - b.effect
+        }) - def;
+        if results.hp > 0.0 && results.sp > 0.0 {
+            self.stats -= results;
+        }
         self.stats
     }
     fn get_dmg(&mut self) -> Stats {

@@ -105,6 +105,12 @@ pub unsafe extern "C" fn move_pc(d:u8) -> bool {
     WORLD.teams.len() == 0
 }
 
+
+#[no_mangle]
+pub unsafe extern "C" fn is_combat()-> bool{
+    WORLD.teams.len() > 1
+}
+
 #[no_mangle]
 pub unsafe extern "C" fn get_buffs(ptr: *mut u8, size: usize)-> *mut u8 {
     WORLD.pack_buffer(ptr,size)

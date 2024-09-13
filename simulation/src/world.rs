@@ -13,7 +13,6 @@ pub struct Pos {
     pub y: usize,
 }
 
-//gets the postion based on a index
 pub fn get_pos(b: Pos, i: usize) -> Pos {
     let column = i % b.x;
     let row = (i - (i % b.x)) / b.x;
@@ -22,8 +21,6 @@ pub fn get_pos(b: Pos, i: usize) -> Pos {
         y: if row > b.y { row % b.y } else { row },
     }
 }
-
-//gets the index based on a postion
 pub fn get_index(b: &Pos, p: &Pos) -> usize {
     p.y * b.y + p.x
 }
